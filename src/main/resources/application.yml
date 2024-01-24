@@ -1,13 +1,10 @@
 spring:
   datasource:
-    url: jdbc:mariadb://localhost:3308/gymtopia
+    url: jdbc:mariadb://localhost:3306/gymtopia
     driver-class-name: org.mariadb.jdbc.Driver
-    username: gymtopia
-    password: gymtopia
+    username: root
+    password: mjjy1081604@
   jpa:
     hibernate:
       ddl-auto: create-drop
     generate-ddl: true
-
-jwt:
-  secret: VGhpcyBpcyBHeW10b3BpYS4gSGF2ZSBhIGdvb2QgZGF5Cg==
