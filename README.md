@@ -11,7 +11,14 @@
 
 ## 개발환경
 
-- JDK 17, Spring Boot, MariaDB, Amazon S3, SSE, Spring Data JPA, Hibernate, Lombok
+- JDK 17
+- Spring Boot
+- MariaDB
+- AWS S3
+- SSE
+- Spring Data JPA
+- Spring Batch
+- Hibernate
 
 ## 기능
 
@@ -100,9 +107,9 @@
 
 ### [ JWT, Security ]
 
-- [ ] 회원가입(비밀번호 암호화)
+- [x] 회원가입(비밀번호 암호화)
 - [ ] 회원 탈퇴
-- [ ] JWT를 이용한 로그인
+- [x] JWT를 이용한 로그인
 - [ ] Security Filter
 
 ### [ 검색 ]
@@ -112,7 +119,7 @@
 ### [ 회원 ]
 
 - [ ] 상세 정보 확인
-- [ ] 트레이너 선택
+- [ ] 트레이너 선택(운동 시작날짜, 종료날짜선택)
 - [ ] 일지 작성 (동영상 최대 1개, 사진 최대 2개)
 - [ ] 일지 수정
 - [ ] 일지 삭제
