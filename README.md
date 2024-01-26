@@ -11,7 +11,14 @@
 
 ## 개발환경
 
-- JDK 17, Spring Boot, MariaDB, Amazon S3, SSE, Spring Data JPA, Hibernate, Lombok
+- JDK 17
+- Spring Boot
+- MariaDB
+- AWS S3
+- SSE
+- Spring Data JPA
+- Spring Batch
+- Hibernate
 
 ## 기능
 
@@ -100,10 +107,10 @@
 
 ### [ JWT, Security ]
 
-- [ ] 회원가입(비밀번호 암호화)
+- [x] 회원가입(비밀번호 암호화)
 - [ ] 회원 탈퇴
-- [ ] JWT를 이용한 로그인
-- [ ] Security Filter
+- [x] JWT를 이용한 로그인
+- [x] Security Filter
 
 ### [ 검색 ]
 
@@ -112,7 +119,7 @@
 ### [ 회원 ]
 
 - [ ] 상세 정보 확인
-- [ ] 트레이너 선택
+- [ ] 트레이너 선택(운동 시작날짜, 종료날짜선택)
 - [ ] 일지 작성 (동영상 최대 1개, 사진 최대 2개)
 - [ ] 일지 수정
 - [ ] 일지 삭제
@@ -146,7 +153,10 @@
 2. JWT, Spring Security를 사용한 인증, 인가
 3. SSE를 사용한 알림기능
 4. 특별 프로그램 신청에서 발생할 수 있는 동시성 문제 처리
-5. ElasticSearch를 활용한 트레이너 검색
+
+# 추후 구현예정
+- ElasticSearch를 활용한 트레이너 검색
+- Spring Batch를 화용한 스케줄링
 
 # ERD
 
