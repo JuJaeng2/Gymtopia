@@ -1,4 +1,4 @@
-package com.project.gymtopia.member.data.model;
+package com.project.gymtopia.trainer.data.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,13 +12,12 @@ import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class MemberSecurityDto implements UserDetails {
+public class TrainerSecurityDto implements UserDetails {
 
   private String name;
   private String email;

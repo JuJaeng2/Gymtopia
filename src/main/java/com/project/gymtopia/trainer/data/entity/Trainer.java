@@ -1,7 +1,8 @@
 package com.project.gymtopia.trainer.data.entity;
 
-import com.project.gymtopia.common.entity.BaseEntity;
+import com.project.gymtopia.common.data.entity.BaseEntity;
 import com.project.gymtopia.common.roles.Roles;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,6 +29,8 @@ public class Trainer extends BaseEntity{
   private Long id;
 
   private String name;
+
+  @Column(unique = true)
   private String email;
   private String password;
   private String number;

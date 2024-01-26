@@ -1,4 +1,4 @@
-package com.project.gymtopia.trainer.data.model;
+package com.project.gymtopia.member.data.model;
 
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -7,17 +7,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class TrainerResponse {
+public class MemberUpdate {
 
-  private String name;
-  private String email;
+  private String address;
   private String number;
   private LocalDate birth;
-  private String gymName;
-  private String introduction;
-  private String career;
+  private String password;
 
 }

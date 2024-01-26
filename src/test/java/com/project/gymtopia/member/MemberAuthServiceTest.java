@@ -113,7 +113,7 @@ public class MemberAuthServiceTest {
   }
 
   @Test
-  @DisplayName("authenticateExcetpion-USER_NOT_FOUND")
+  @DisplayName("authenticateException-USER_NOT_FOUND")
   void authenticateExceptionTest1() {
     //given
 

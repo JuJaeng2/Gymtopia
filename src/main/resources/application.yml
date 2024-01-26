@@ -6,7 +6,8 @@ spring:
     password: gymtopia
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
+    #      ddl-auto: create-drop
     generate-ddl: true
 
 jwt:

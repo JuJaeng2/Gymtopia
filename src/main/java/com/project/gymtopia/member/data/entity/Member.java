@@ -1,7 +1,8 @@
 package com.project.gymtopia.member.data.entity;
 
-import com.project.gymtopia.common.entity.BaseEntity;
+import com.project.gymtopia.common.data.entity.BaseEntity;
 import com.project.gymtopia.common.roles.Roles;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,9 +27,11 @@ public class Member extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
   private String name;
+
+  @Column(unique = true)
   private String email;
+
   private String password;
   private String number;
   private LocalDate birth;
