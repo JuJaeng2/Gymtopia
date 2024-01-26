@@ -6,6 +6,7 @@ import static com.project.gymtopia.exception.ErrorCode.WRONG_PASSWORD;
 import com.project.gymtopia.common.data.model.TokenResponse;
 import com.project.gymtopia.common.data.model.UserDto;
 import com.project.gymtopia.common.data.model.UserSignUpForm;
+import com.project.gymtopia.common.roles.Roles;
 import com.project.gymtopia.config.jwt.JwtToken;
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;
@@ -14,7 +15,6 @@ import com.project.gymtopia.member.data.model.MemberDto;
 import com.project.gymtopia.member.data.model.MemberResponse;
 import com.project.gymtopia.member.repository.MemberRepository;
 import com.project.gymtopia.member.service.MemberAuthService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         .id(member.getId())
         .name(member.getName())
         .email(member.getEmail())
-        .role(member.getRole().get(0))
+        .role(Roles.MEMBER)
         .build();
   }
 
@@ -67,7 +67,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         .name(userSignUpForm.getName())
         .email(userSignUpForm.getEmail())
         .password(encodingPassword)
-        .role(List.of("MEMBER"))
+        .role(Roles.MEMBER)
         .birth(userSignUpForm.getBirth())
         .number(userSignUpForm.getNumber())
         .address(userSignUpForm.getAddress())

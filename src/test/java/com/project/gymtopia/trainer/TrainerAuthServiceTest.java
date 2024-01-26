@@ -4,6 +4,7 @@ import com.project.gymtopia.common.data.model.TokenResponse;
 import com.project.gymtopia.common.data.model.UserDto;
 import com.project.gymtopia.common.data.model.UserSignInForm;
 import com.project.gymtopia.common.data.model.UserSignUpForm;
+import com.project.gymtopia.common.roles.Roles;
 import com.project.gymtopia.config.jwt.JwtToken;
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;
@@ -13,7 +14,6 @@ import com.project.gymtopia.trainer.data.model.TrainerResponse;
 import com.project.gymtopia.trainer.repository.TrainerRepository;
 import com.project.gymtopia.trainer.service.impl.TrainerAuthServiceImpl;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,10 +57,9 @@ public class TrainerAuthServiceTest {
         .name("홍길동")
         .birth(LocalDate.parse("1998-03-26"))
         .password(encodingPassword)
-        .role(List.of("TRAINER"))
+        .role(Roles.TRAINER)
         .email("gildong@naver.com")
         .number("010-1111-2222")
-        .active_state("TRUE")
         .build();
 
     signInForm = UserSignInForm.builder()
@@ -95,7 +94,7 @@ public class TrainerAuthServiceTest {
 
     Assertions.assertEquals("홍길동", trainerDto.getName());
     Assertions.assertEquals("gildong@naver.com", trainerDto.getEmail());
-    Assertions.assertEquals("TRAINER", trainerDto.getRole());
+    Assertions.assertEquals(Roles.TRAINER, trainerDto.getRole());
 
   }
 
@@ -149,11 +148,11 @@ public class TrainerAuthServiceTest {
         .email("gildong@naver.com")
         .id(1L)
         .name("홍길동")
-        .role("TRAINER")
+        .role(Roles.TRAINER)
         .build();
 
     Mockito.when(jwtToken.createToken(Mockito.any(
-        UserDto.class),Mockito.anyString())).thenReturn(new TokenResponse("New Token"));
+        UserDto.class),Mockito.any(Roles.class))).thenReturn(new TokenResponse("New Token"));
 
     //when
     TokenResponse tokenResponse = trainerAuthService.createToken(trainerDto);

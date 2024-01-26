@@ -10,17 +10,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/trainer")
 public class TrainerJoinController {
 
   private final TrainerAuthService trainerAuthService;
 
-  @PostMapping("/signUp")
+  @PostMapping("/signUp/trainer")
   public ResponseEntity<TrainerResponse> memberSignUp(@RequestBody UserSignUpForm userSignUpForm) {
 
     TrainerResponse trainerResponse = trainerAuthService.signUp(userSignUpForm);
@@ -28,7 +26,7 @@ public class TrainerJoinController {
     return ResponseEntity.ok(trainerResponse);
   }
 
-  @PostMapping("/signIn")
+  @PostMapping("/signIn/trainer")
   public ResponseEntity<TokenResponse> memberSignIn(@RequestBody UserSignInForm userSignInForm) {
 
     TrainerDto trainerDto = trainerAuthService.authenticate(userSignInForm.getEmail(),

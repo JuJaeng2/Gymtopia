@@ -71,7 +71,7 @@ public class TrainerJoinControllerTest {
 
     // then
     mockMvc.perform(
-            MockMvcRequestBuilders.post("/trainer/signUp").with(csrf())
+            MockMvcRequestBuilders.post("/signUp/trainer").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(signUpForm)))
         .andExpect(MockMvcResultMatchers.status().isOk())
@@ -103,7 +103,7 @@ public class TrainerJoinControllerTest {
 
     //then
     mockMvc.perform(
-            MockMvcRequestBuilders.post("/trainer/signIn").with(csrf())
+            MockMvcRequestBuilders.post("/signIn/trainer").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(signInForm)))
         .andExpect(MockMvcResultMatchers.status().isOk())

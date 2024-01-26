@@ -2,6 +2,7 @@ package com.project.gymtopia.config.jwt;
 
 import com.project.gymtopia.common.data.model.TokenResponse;
 import com.project.gymtopia.common.data.model.UserDto;
+import com.project.gymtopia.common.roles.Roles;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -9,10 +10,12 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -24,7 +27,7 @@ public class JwtToken {
   private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60;
   private UserDetailsService userDetailsService;
 
-  public TokenResponse createToken(UserDto userDto, String role){
+  public TokenResponse createToken(UserDto userDto, Roles role){
     Claims claims = Jwts.claims().setSubject(userDto.getName());
     claims.put("role", role);
 
@@ -42,7 +45,7 @@ public class JwtToken {
 
   public Authentication getAuthentication(String token) {
     UserDetails userDetails = userDetailsService.loadUserByUsername(getUserName(token));
-    return null;
+    return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
 
   private String getUserName(String token){
@@ -58,6 +61,10 @@ public class JwtToken {
   }
 
   public boolean validateToken(String token) {
-    return false;
+    if (!StringUtils.hasText(token)) return false;
+
+    Claims claims = parseClaims(token);
+    return !claims.getExpiration().before(new Date());
+
   }
 }

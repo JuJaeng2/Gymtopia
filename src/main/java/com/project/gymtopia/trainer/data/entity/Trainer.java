@@ -1,25 +1,19 @@
 package com.project.gymtopia.trainer.data.entity;
 
 import com.project.gymtopia.common.entity.BaseEntity;
-import jakarta.persistence.ElementCollection;
+import com.project.gymtopia.common.roles.Roles;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Getter
@@ -27,7 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Trainer extends BaseEntity implements UserDetails {
+public class Trainer extends BaseEntity{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,40 +36,9 @@ public class Trainer extends BaseEntity implements UserDetails {
   private String introduction;
   private String career;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  private List<String> role = new ArrayList<>();
+  @Enumerated(EnumType.STRING)
+  private Roles role;
 
-  // enum으로 표시하기
-  private String active_state;
+  private LocalDate removedDate;
 
-
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return this.role.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-  }
-
-  @Override
-  public String getUsername() {
-    return this.name;
-  }
-
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
-
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return true;
-  }
 }

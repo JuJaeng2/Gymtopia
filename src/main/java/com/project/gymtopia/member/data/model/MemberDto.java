@@ -1,5 +1,6 @@
 package com.project.gymtopia.member.data.model;
 
+import com.project.gymtopia.common.roles.Roles;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +17,6 @@ public class MemberDto {
   private Long id;
   private String name;
   private String email;
-  private String role;
+  private Roles role;
 
 }

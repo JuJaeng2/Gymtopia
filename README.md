@@ -110,7 +110,7 @@
 - [x] 회원가입(비밀번호 암호화)
 - [ ] 회원 탈퇴
 - [x] JWT를 이용한 로그인
-- [ ] Security Filter
+- [x] Security Filter
 
 ### [ 검색 ]
 
@@ -153,7 +153,10 @@
 2. JWT, Spring Security를 사용한 인증, 인가
 3. SSE를 사용한 알림기능
 4. 특별 프로그램 신청에서 발생할 수 있는 동시성 문제 처리
-5. ElasticSearch를 활용한 트레이너 검색
+
+# 추후 구현예정
+- ElasticSearch를 활용한 트레이너 검색
+- Spring Batch를 화용한 스케줄링
 
 # ERD
 

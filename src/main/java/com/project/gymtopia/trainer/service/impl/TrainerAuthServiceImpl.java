@@ -3,6 +3,7 @@ package com.project.gymtopia.trainer.service.impl;
 import com.project.gymtopia.common.data.model.TokenResponse;
 import com.project.gymtopia.common.data.model.UserDto;
 import com.project.gymtopia.common.data.model.UserSignUpForm;
+import com.project.gymtopia.common.roles.Roles;
 import com.project.gymtopia.config.jwt.JwtToken;
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;
@@ -11,7 +12,6 @@ import com.project.gymtopia.trainer.data.model.TrainerDto;
 import com.project.gymtopia.trainer.data.model.TrainerResponse;
 import com.project.gymtopia.trainer.repository.TrainerRepository;
 import com.project.gymtopia.trainer.service.TrainerAuthService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class TrainerAuthServiceImpl implements TrainerAuthService {
         .id(trainer.getId())
         .name(trainer.getName())
         .email(trainer.getEmail())
-        .role(trainer.getRole().get(0))
+        .role(trainer.getRole())
         .build();
   }
 
@@ -66,7 +66,7 @@ public class TrainerAuthServiceImpl implements TrainerAuthService {
         .name(userSignUpForm.getName())
         .email(userSignUpForm.getEmail())
         .password(encodingPassword)
-        .role(List.of("TRAINER"))
+        .role(Roles.TRAINER)
         .birth(userSignUpForm.getBirth())
         .number(userSignUpForm.getNumber())
         .build();
