@@ -9,13 +9,16 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.annotation.PostConstruct;
 import java.util.Date;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -23,6 +26,13 @@ import org.springframework.util.StringUtils;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtToken {
+
+  private Map<Roles, UserDetailsService> authMap;
+
+  @PostConstruct
+  void init(){
+    authMap = Map.of(Roles.MEMBER, memberDetailsService, Roles.TRAINER, trainerDetailsService);
+  }
 
   @Value("${jwt.secret}")
   private String secretKey;
@@ -50,13 +60,8 @@ public class JwtToken {
 
   public Authentication getAuthentication(String token, Roles role) {
 
-    UserDetails userDetails;
-
-    if (role == Roles.MEMBER){
-      userDetails = memberDetailsService.loadUserByUsername(getUserEmail(token));
-    }else{
-      userDetails = trainerDetailsService.loadUserByUsername(getUserEmail(token));
-    }
+    UserDetails userDetails =
+        authMap.get(role).loadUserByUsername(getUserEmail(token));
 
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
