@@ -49,6 +49,7 @@ public class TrainerAuthServiceImpl implements TrainerAuthService {
         UserDto.builder()
             .id(trainerDto.getId())
             .name(trainerDto.getName())
+            .email(trainerDto.getEmail())
             .build(),
         trainerDto.getRole());
   }

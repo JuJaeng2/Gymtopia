@@ -3,21 +3,24 @@ package com.project.gymtopia.config.jwt;
 import com.project.gymtopia.common.data.model.TokenResponse;
 import com.project.gymtopia.common.data.model.UserDto;
 import com.project.gymtopia.common.roles.Roles;
+import com.project.gymtopia.common.service.MemberDetailsServiceImpl;
+import com.project.gymtopia.common.service.TrainerDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class JwtToken {
 
@@ -25,11 +28,13 @@ public class JwtToken {
   private String secretKey;
 
   private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60;
-  private UserDetailsService userDetailsService;
+  private final TrainerDetailsServiceImpl trainerDetailsService;
+  private final MemberDetailsServiceImpl memberDetailsService;
 
   public TokenResponse createToken(UserDto userDto, Roles role){
     Claims claims = Jwts.claims().setSubject(userDto.getName());
     claims.put("role", role);
+    claims.put("email", userDto.getEmail());
 
     Date now = new Date();
     Date expiredDate = new Date(now.getTime() + TOKEN_EXPIRE_TIME);
@@ -43,13 +48,22 @@ public class JwtToken {
     return TokenResponse.builder().token(token).build();
   }
 
-  public Authentication getAuthentication(String token) {
-    UserDetails userDetails = userDetailsService.loadUserByUsername(getUserName(token));
+  public Authentication getAuthentication(String token, Roles role) {
+
+    UserDetails userDetails;
+
+    if (role == Roles.MEMBER){
+      userDetails = memberDetailsService.loadUserByUsername(getUserEmail(token));
+    }else{
+      userDetails = trainerDetailsService.loadUserByUsername(getUserEmail(token));
+    }
+
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
 
-  private String getUserName(String token){
-    return parseClaims(token).get("role", String.class);
+  private String getUserEmail(String token){
+    log.info("Parsing Token Email >>> " + parseClaims(token).get("email", String.class));
+    return parseClaims(token).get("email", String.class);
   }
 
   private Claims parseClaims(String token){
@@ -65,6 +79,10 @@ public class JwtToken {
 
     Claims claims = parseClaims(token);
     return !claims.getExpiration().before(new Date());
+  }
 
+  public  Roles getRole(String token){
+    Claims claims = parseClaims(token);
+    return Roles.valueOf(claims.get("role", String.class));
   }
 }

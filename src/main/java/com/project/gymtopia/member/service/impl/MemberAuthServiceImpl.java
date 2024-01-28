@@ -49,7 +49,11 @@ public class MemberAuthServiceImpl implements MemberAuthService {
   @Override
   public TokenResponse createToken(MemberDto memberDto) {
 
-    return jwtToken.createToken(new UserDto(memberDto.getId(), memberDto.getName()),
+    return jwtToken.createToken(
+        UserDto.builder()
+            .name(memberDto.getName())
+            .email(memberDto.getEmail())
+            .build(),
         memberDto.getRole());
   }
 

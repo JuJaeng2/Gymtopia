@@ -10,14 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TrainerResponse {
+public class TrainerUpdate {
 
-  private String name;
-  private String email;
   private String number;
   private LocalDate birth;
   private String gymName;
   private String introduction;
   private String career;
-
+  private String password;
 }
