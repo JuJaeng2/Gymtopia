@@ -1,0 +1,2 @@
+### 이미지 저장
+POST http://localhost:8080/member/journal/upload

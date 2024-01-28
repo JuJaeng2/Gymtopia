@@ -9,6 +9,31 @@ spring:
       ddl-auto: update
     #      ddl-auto: create-drop
     generate-ddl: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+cloud:
+  aws:
+    credentials:
+      access-key: AKIAZTEEOWWN3CSM63KP
+      secret-key: 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
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+    s3:
+      bucket: gymtopia
 
 jwt:
   secret: VGhpcyBpcyBHeW10b3BpYS4gSGF2ZSBhIGdvb2QgZGF5Cg==
+
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          com.amazonaws.util.EC2MetadataUtils: ERROR
+
