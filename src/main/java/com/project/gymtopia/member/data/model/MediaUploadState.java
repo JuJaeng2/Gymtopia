@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class JournalForm {
+@Setter
+public class MediaUploadState {
 
-  private String title;
-  private String contents;
+  private boolean success;
+  private String fileUrl;
 
 }

@@ -60,7 +60,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
   @Override
   public MemberResponse signUp(UserSignUpForm userSignUpForm) {
 
-    System.out.println("이메일이 존재 여부 >>>" + isEmailExist(userSignUpForm.getEmail()));
     if (isEmailExist(userSignUpForm.getEmail())) {
       throw new CustomException(ErrorCode.REGISTERED_EMAIL);
     }
