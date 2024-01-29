@@ -1,5 +1,6 @@
 package com.project.gymtopia.member.data.model;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,9 +12,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class JournalForm {
+public class MediaResponse {
 
-  private String title;
-  private String contents;
+  private List<String> imageUrlList;
+  private String videoUrl;
 
 }

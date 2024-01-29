@@ -15,8 +15,11 @@ public enum ErrorCode {
 
   //AWS S3 ImageException
   IMAGE_UPLOAD_FAIL(HttpStatus.BAD_REQUEST, "이미지 업로드에 실패했습니다."),
-  IMAGE_DELETE_FAIL(HttpStatus.BAD_REQUEST, "이미지 삭제에 실패했습니다.");
+  IMAGE_DELETE_FAIL(HttpStatus.BAD_REQUEST, "이미지 삭제에 실패했습니다."),
 
+  //Journal
+  JOURNAL_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 일지입니다."),
+  NOT_SAME_MEMBER_AND_WRITER(HttpStatus.BAD_REQUEST, "일지 작성자와 일지를 조회하려는 회원이 동일하지 않습니다.");
   private final HttpStatus httpStatus;
   private final String message;
 }
