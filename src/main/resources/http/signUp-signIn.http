@@ -4,9 +4,9 @@ POST http://localhost:8080/signUp/member
 Content-Type: application/json
 
 {
-  "name": "홍길동",
-  "email": "gildong@naver.com",
-  "password": "12345",
+  "name": "유저1",
+  "email": "test1@naver.com",
+  "password": "1111",
   "address": "서울시 어쩌구 저쩌구",
   "birth": "1998-03-26",
   "number": "010-1111-2222"
@@ -17,8 +17,8 @@ POST http://localhost:8080/signIn/member
 Content-Type: application/json
 
 {
-  "email": "gildong@naver.com",
-  "password": "12345"
+  "email": "test1@naver.com",
+  "password": "1111"
 }
 
 ### Trainer 회원가입
