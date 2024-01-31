@@ -29,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/member/journal")
+@RequestMapping("/member")
 public class MemberJournalController {
 
   private final AmazonS3 amazonS3;
@@ -38,7 +38,7 @@ public class MemberJournalController {
 
   private final MemberJournalService memberJournalService;
 
-  @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+  @PostMapping(value = "/journal", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
       MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<?> uploadJournal(
       Authentication authentication,
@@ -70,7 +70,7 @@ public class MemberJournalController {
 
 
 
-  @GetMapping("/read/{journalId}")
+  @GetMapping("/journal/{journalId}")
   public ResponseEntity<?> readJournal(Authentication authentication, @PathVariable long journalId){
 
     String email = authentication.getName();
@@ -79,7 +79,7 @@ public class MemberJournalController {
     return ResponseEntity.ok(journalResponse);
   }
 
-  @PutMapping("/update/{journalId}")
+  @PutMapping("/journal/{journalId}")
   public ResponseEntity<?> updateJournal(
       Authentication authentication,
       @PathVariable long journalId,
@@ -109,7 +109,7 @@ public class MemberJournalController {
     return ResponseEntity.ok(ResponseMessage.builder().message("일지 업데이트를 실패했습니다...!").build());
   }
 
-  @DeleteMapping("/delete/{journalId}")
+  @DeleteMapping("/journal/{journalId}")
   public ResponseEntity<?> deleteJournal(
       Authentication authentication,
       @PathVariable Long journalId

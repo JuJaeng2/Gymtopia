@@ -131,14 +131,10 @@ public class MemberJournalServiceImpl implements MemberJournalService {
     }
 
     // JournalResponse 리턴
-    MediaResponse mediaResponse;
-    Optional<List<Media>> optionalMediaList = mediaRepository.findALlByJournal(journal);
 
-    if (optionalMediaList.isPresent()) {
-      mediaResponse = classifyMedia(optionalMediaList.get());
-    } else {
-      mediaResponse = null;
-    }
+    Optional<List<Media>> optionalMediaList = mediaRepository.findALlByJournal(journal);
+    MediaResponse mediaResponse = optionalMediaList.isPresent() ? classifyMedia(optionalMediaList.get()) : null;
+
 
     FeedBackDto feedBackDto;
     Optional<FeedBack> optionalFeedBack = feedBackRepository.findByJournal(journal);
@@ -214,7 +210,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
       }
     }
 
-    mediaRepository.deleteAll(mediaList);
+    mediaRepository.deleteAllInQuery(journal);
 
     // 파일 저장
     for (String mediaFileUrl : mediaFileUrlList) {
@@ -246,7 +242,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
         deleteImage(media.getUrl().substring(idx + 1));
       }
 
-      mediaRepository.deleteAll(mediaList);
+      mediaRepository.deleteAllInQuery(journal);
     }
 
     journalRepository.delete(journal);
