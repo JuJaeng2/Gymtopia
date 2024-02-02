@@ -1,4 +1,4 @@
-package com.project.gymtopia.member.data.model;
+package com.project.gymtopia.trainer.data.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Setter
-public class ImageUploadState {
+public class FeedBackDto {
 
-  private boolean success;
-  private String imageUrl;
+  private String trainerName;
+  private String contents;
 
 }
