@@ -21,7 +21,7 @@ public class TrainerInfoServiceImpl implements TrainerInfoService {
   public TrainerResponse getTrainerInformation(String email){
 
     Trainer trainer = trainerRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     return TrainerResponse.builder()
         .name(trainer.getName())
         .email(trainer.getEmail())
@@ -38,7 +38,7 @@ public class TrainerInfoServiceImpl implements TrainerInfoService {
   public TrainerResponse updateInfo(TrainerUpdate trainerUpdate, String email) {
 
     Trainer trainer = trainerRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     trainer.setNumber(trainerUpdate.getNumber());
     trainer.setBirth(trainerUpdate.getBirth());

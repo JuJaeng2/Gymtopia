@@ -1,6 +1,5 @@
 package com.project.gymtopia.member.controller;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.project.gymtopia.common.data.model.ResponseMessage;
 import com.project.gymtopia.exception.ImageUploadException;
 import com.project.gymtopia.member.data.model.JournalForm;
@@ -32,12 +31,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/member")
 public class MemberJournalController {
 
-  private final AmazonS3 amazonS3;
   @Value("${cloud.aws.s3.bucket}")
-  private String bucket;
 
   private final MemberJournalService memberJournalService;
 
+  /**
+   * 선택한 미션이 없는 경우 일지를 작성 하는 API
+   */
   @PostMapping(value = "/journal", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
       MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<?> uploadJournal(
@@ -57,21 +57,58 @@ public class MemberJournalController {
     }
 
     String email = authentication.getName();
-   if(memberJournalService.uploadJournal(journalForm, email, imageFileList, videoFile.get(0))){
-     return ResponseEntity.ok(ResponseMessage.builder()
-         .message("일지 저장 성공!!")
-         .build());
-   }
+    if (memberJournalService.uploadJournal(journalForm, email, imageFileList, videoFile.get(0))) {
+      return ResponseEntity.ok(ResponseMessage.builder()
+          .message("일지 저장 성공!!")
+          .build());
+    }
 
     return ResponseEntity.ok(ResponseMessage.builder()
         .message("일지 저장 실패...!!")
         .build());
   }
 
+  /**
+   * 미션을 선택하고 미션에 관한 일지를 작성 하는 API
+   */
+  @PostMapping(value = "/journal/mission/{missionId}"
+      , consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+      MediaType.APPLICATION_JSON_VALUE})
+  public ResponseEntity<?> uploadJournalWithMission(
+      Authentication authentication,
+      @PathVariable(value = "missionId") long missionId,
+      @RequestPart(value = "journal", required = false) JournalForm journalForm,
+      @Validated @RequestPart(value = "imageFileList", required = false) List<MultipartFile> imageFileList,
+      @RequestPart(value = "videoFile", required = false) List<MultipartFile> videoFile
+  ) throws IOException {
 
+    if (!isMultipartFileValid(imageFileList, videoFile)) {
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST)
+          .body(ResponseMessage.builder()
+              .message("이미지 파일은 최대 2개, 영상 파일은 최대 1개까지만 업로드 가능합니다.")
+              .build()
+          );
+    }
 
+    String email = authentication.getName();
+    if (memberJournalService.uploadJournal(journalForm, email, missionId, imageFileList, videoFile.get(0))) {
+      return ResponseEntity.ok(ResponseMessage.builder()
+          .message("일지 저장 성공!!")
+          .build());
+    }
+
+    return ResponseEntity.ok(ResponseMessage.builder()
+        .message("일지 저장 실패...!!")
+        .build());
+  }
+
+  /**
+   * 특정 일지를 읽기 위한 API
+   */
   @GetMapping("/journal/{journalId}")
-  public ResponseEntity<?> readJournal(Authentication authentication, @PathVariable long journalId){
+  public ResponseEntity<?> readJournal(Authentication authentication,
+      @PathVariable long journalId) {
 
     String email = authentication.getName();
     JournalResponse journalResponse = memberJournalService.getJournalDetail(journalId, email);
@@ -79,6 +116,9 @@ public class MemberJournalController {
     return ResponseEntity.ok(journalResponse);
   }
 
+  /**
+   * 일지를 업데이트 하기 위한 API
+   */
   @PutMapping("/journal/{journalId}")
   public ResponseEntity<?> updateJournal(
       Authentication authentication,
@@ -100,20 +140,24 @@ public class MemberJournalController {
     String email = authentication.getName();
 
     log.info(email);
-    boolean result = memberJournalService.updateJournal(journalForm, email, journalId, imageFileList, videoFile.get(0));
+    boolean result = memberJournalService.updateJournal(journalForm, email, journalId,
+        imageFileList, videoFile.get(0));
 
-    if (result){
+    if (result) {
       return ResponseEntity.ok(ResponseMessage.builder().message("일지 업데이트를 완료했습니다.").build());
     }
 
     return ResponseEntity.ok(ResponseMessage.builder().message("일지 업데이트를 실패했습니다...!").build());
   }
 
+  /**
+   * 일지를 삭제하기 위한 API
+   */
   @DeleteMapping("/journal/{journalId}")
   public ResponseEntity<?> deleteJournal(
       Authentication authentication,
       @PathVariable Long journalId
-  ){
+  ) {
 
     String email = authentication.getName();
     log.info("Controller Email >>> {}", journalId);

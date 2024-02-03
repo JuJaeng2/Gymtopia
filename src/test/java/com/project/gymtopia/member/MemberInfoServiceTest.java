@@ -82,7 +82,7 @@ public class MemberInfoServiceTest {
         memberInfoService.getMemberInformation(Mockito.anyString()));
 
     //then
-    Assertions.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), exception.getMessage());
+    Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
   }
 
   @Test
@@ -122,7 +122,7 @@ public class MemberInfoServiceTest {
         memberInfoService.updateInfo(memberUpdate, "test@naver.com"));
 
     //then
-    Assertions.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), exception.getMessage());
+    Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
 
   }
 

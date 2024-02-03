@@ -24,7 +24,7 @@ public class TrainerDetailsServiceImpl implements UserDetailsService {
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
     Trainer trainer = trainerRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     return TrainerSecurityDto.builder()
         .name(trainer.getName())

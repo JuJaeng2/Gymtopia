@@ -1,6 +1,6 @@
 package com.project.gymtopia.common.service;
 
-import static com.project.gymtopia.exception.ErrorCode.USER_NOT_FOUND;
+import static com.project.gymtopia.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.member.data.entity.Member;
@@ -24,7 +24,7 @@ public class MemberDetailsServiceImpl implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
     return MemberSecurityDto.builder()
         .name(member.getName())

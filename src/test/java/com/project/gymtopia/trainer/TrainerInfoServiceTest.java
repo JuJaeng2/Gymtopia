@@ -19,16 +19,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 public class TrainerInfoServiceTest {
 
   @Mock
   private TrainerRepository trainerRepository;
-
-  @Mock
-  private PasswordEncoder passwordEncoder;
 
   @InjectMocks
   TrainerInfoServiceImpl trainerInfoService;
@@ -92,7 +88,7 @@ public class TrainerInfoServiceTest {
         trainerInfoService.getTrainerInformation(Mockito.anyString()));
 
     //then
-    Assertions.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), exception.getMessage());
+    Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
   }
 
   @Test
@@ -127,7 +123,7 @@ public class TrainerInfoServiceTest {
     Throwable exception = Assertions.assertThrows(CustomException.class,
         () -> trainerInfoService.updateInfo(trainerUpdate1,email));
 
-    Assertions.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), exception.getMessage());
+    Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
 
 
 
