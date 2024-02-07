@@ -1,8 +1,8 @@
 package com.project.gymtopia.member.service.impl;
 
 import static com.project.gymtopia.exception.ErrorCode.JOURNAL_NOT_FOUND;
-import static com.project.gymtopia.exception.ErrorCode.NOT_SAME_MEMBER_AND_WRITER;
 import static com.project.gymtopia.exception.ErrorCode.MEMBER_NOT_FOUND;
+import static com.project.gymtopia.exception.ErrorCode.NOT_SAME_MEMBER_AND_WRITER;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
@@ -14,6 +14,7 @@ import com.project.gymtopia.common.data.MissionState;
 import com.project.gymtopia.common.data.entity.Mission;
 import com.project.gymtopia.common.data.model.ResponseMessage;
 import com.project.gymtopia.common.repository.MissionRepository;
+import com.project.gymtopia.common.service.AlarmService;
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;
 import com.project.gymtopia.exception.ImageUploadException;
@@ -33,20 +34,23 @@ import com.project.gymtopia.trainer.data.model.FeedBackDto;
 import com.project.gymtopia.trainer.repository.FeedBackRepository;
 import com.project.gymtopia.util.MediaUtil;
 import com.project.gymtopia.util.MultipartUtil;
+import jakarta.annotation.Nullable;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.util.Pair;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Primary
 public class MemberJournalServiceImpl implements MemberJournalService {
 
   @Value("${cloud.aws.s3.bucket}")
@@ -58,8 +62,12 @@ public class MemberJournalServiceImpl implements MemberJournalService {
   private final MissionRepository missionRepository;
   private final MemberRepository memberRepository;
   private final FeedBackRepository feedBackRepository;
+  private final AlarmService alarmService;
 
 
+  /**
+   * Daily Journal 업로드
+   */
   @Override
   public boolean uploadJournal(
       JournalForm journalForm,
@@ -70,12 +78,11 @@ public class MemberJournalServiceImpl implements MemberJournalService {
     Member member = memberRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
-
     // 저널 내용 저장
     Journal journal = saveJournalDetail(
         journalForm.getTitle(),
         journalForm.getContents(),
-        Optional.empty(),
+        null,
         member);
 
     // S3 이미지 저장
@@ -96,12 +103,12 @@ public class MemberJournalServiceImpl implements MemberJournalService {
     for (String mediaFileUrl : mediaFileUrlList) {
       saveImageUrl(journal, mediaFileUrl);
     }
-
-    //TODO: 일지 저장이 완료된 후 트레이너에게 알림 보내기
-
     return true;
   }
 
+  /**
+   * Mission Journal 업로드
+   */
   @Override
   public boolean uploadJournal(JournalForm journalForm, String email, long missionId,
       List<MultipartFile> imageMultipartFileList, MultipartFile videoMultipartFile) throws IOException {
@@ -116,7 +123,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
     Journal journal = saveJournalDetail(
         journalForm.getTitle(),
         journalForm.getContents(),
-        Optional.of(mission),
+        mission,
         member);
 
     // S3 이미지 저장
@@ -139,8 +146,10 @@ public class MemberJournalServiceImpl implements MemberJournalService {
     }
 
     //TODO: 일지 저장이 완료된 후 트레이너에게 알림 보내기
+    String message = member.getName() + "님이 일지를 작성했습니다. 확인 후 피드백을 남겨주세요.";
+    alarmService.send(member, mission.getTrainer(), message);
 
-    return false;
+    return true;
   }
 
   private void checkUploadState(MediaUploadState mediaUploadState, List<String> mediaFileUrlList)
@@ -174,11 +183,10 @@ public class MemberJournalServiceImpl implements MemberJournalService {
       throw new CustomException(ErrorCode.NOT_SAME_MEMBER_AND_WRITER);
     }
 
-    // JournalResponse 리턴
+    List<Media> mediaList = mediaRepository.findAllByJournal(journal);
 
-    Optional<List<Media>> optionalMediaList = mediaRepository.findALlByJournal(journal);
     MediaResponse mediaResponse =
-        optionalMediaList.isPresent() ? MediaUtil.classifyMedia(optionalMediaList.get()) : null;
+        mediaList.isEmpty() ? null : MediaUtil.classifyMedia(mediaList);
 
     FeedBackDto feedBackDto;
     Optional<FeedBack> optionalFeedBack = feedBackRepository.findByJournal(journal);
@@ -222,8 +230,10 @@ public class MemberJournalServiceImpl implements MemberJournalService {
       throw new CustomException(ErrorCode.NOT_SAME_MEMBER_AND_WRITER);
     }
 
-    List<Media> mediaList = mediaRepository.findALlByJournal(journal)
-        .orElseThrow(() -> new CustomException(JOURNAL_NOT_FOUND));
+    List<Media> mediaList = mediaRepository.findAllByJournal(journal);
+    if (mediaList.isEmpty()){
+      throw new CustomException(JOURNAL_NOT_FOUND);
+    }
 
     // Journal 업데이트
     journal.setTitle(journalForm.getTitle());
@@ -277,10 +287,11 @@ public class MemberJournalServiceImpl implements MemberJournalService {
       throw new CustomException(NOT_SAME_MEMBER_AND_WRITER);
     }
 
-    Optional<List<Media>> optionalMediaList = mediaRepository.findALlByJournal(journal);
-    if (optionalMediaList.isPresent()) {
+    List<Media> mediaList = mediaRepository.findAllByJournal(journal);
+
+    if (!mediaList.isEmpty()) {
       int idx = 0;
-      for (Media media : optionalMediaList.get()) {
+      for (Media media : mediaList) {
         idx = media.getUrl().lastIndexOf("/");
         deleteImage(media.getUrl().substring(idx + 1));
       }
@@ -299,16 +310,14 @@ public class MemberJournalServiceImpl implements MemberJournalService {
   /**
    * 일지를 repository에 저장하는 메소드
    */
-  private Journal saveJournalDetail(String title, String contents, Optional<Mission> optionalMission
-      ,Member member) {
-
-    Pair<JournalType, Mission> journalTypeAndMission =
-        optionalMission.map(mission -> Pair.of(JournalType.MISSION_JOURNAL,mission))
-            .orElseGet(() -> Pair.of(JournalType.DAILY_JOURNAL, null));
+  private Journal saveJournalDetail(
+      String title, String contents, @Nullable Mission mission, Member member) {
 
     Journal newJournal = Journal.builder()
-        .type(journalTypeAndMission.getFirst())
-        .mission(journalTypeAndMission.getSecond())
+        .type(
+            mission == null ? JournalType.DAILY_JOURNAL : JournalType.MISSION_JOURNAL
+        )
+        .mission(mission)
         .title(title)
         .contents(contents)
         .member(member)
@@ -376,6 +385,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
     Media newMedia = Media.builder()
         .url(imageUrl)
         .journal(journal)
+        .uploadDateTime(LocalDateTime.now())
         .build();
 
     mediaRepository.save(newMedia);

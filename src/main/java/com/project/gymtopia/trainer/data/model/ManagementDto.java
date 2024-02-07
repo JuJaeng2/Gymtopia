@@ -1,6 +1,7 @@
 package com.project.gymtopia.trainer.data.model;
 
 
+import com.project.gymtopia.trainer.data.entity.Management;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,16 @@ public class ManagementDto {
   private LocalDate registerDate;
   private LocalDate endDate;
 
-
+  public static ManagementDto from(Management management){
+    return ManagementDto.builder()
+        .memberName(management.getMember().getName())
+        .email(management.getMember().getEmail())
+        .number(management.getMember().getNumber())
+        .address(management.getMember().getAddress())
+        .birth(management.getMember().getBirth())
+        .registerDate(management.getRegisterDate())
+        .endDate(management.getEndDate())
+        .build();
+  }
 
 }

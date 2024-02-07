@@ -3,6 +3,7 @@ package com.project.gymtopia.trainer.controller;
 import com.project.gymtopia.common.data.model.TokenResponse;
 import com.project.gymtopia.common.data.model.UserSignInForm;
 import com.project.gymtopia.common.data.model.UserSignUpForm;
+import com.project.gymtopia.common.service.AlarmService;
 import com.project.gymtopia.trainer.data.model.TrainerDto;
 import com.project.gymtopia.trainer.data.model.TrainerResponse;
 import com.project.gymtopia.trainer.service.TrainerAuthService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TrainerJoinController {
 
   private final TrainerAuthService trainerAuthService;
+  private final AlarmService alarmService;
 
   @PostMapping("/signUp/trainer")
   public ResponseEntity<TrainerResponse> memberSignUp(@RequestBody UserSignUpForm userSignUpForm) {

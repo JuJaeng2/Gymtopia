@@ -1,4 +1,4 @@
-package com.project.gymtopia.common.service;
+package com.project.gymtopia.common.service.impl;
 
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;
@@ -7,7 +7,6 @@ import com.project.gymtopia.trainer.data.model.TrainerSecurityDto;
 import com.project.gymtopia.trainer.repository.TrainerRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Qualifier("trainerDetailsService")
 public class TrainerDetailsServiceImpl implements UserDetailsService {
 
   private final TrainerRepository trainerRepository;

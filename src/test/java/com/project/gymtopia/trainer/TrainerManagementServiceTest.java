@@ -9,10 +9,12 @@ import com.project.gymtopia.exception.ErrorCode;
 import com.project.gymtopia.member.data.entity.Journal;
 import com.project.gymtopia.member.data.entity.Media;
 import com.project.gymtopia.member.data.entity.Member;
+import com.project.gymtopia.member.data.entity.Register;
 import com.project.gymtopia.member.data.model.JournalResponse;
 import com.project.gymtopia.member.repository.JournalRepository;
 import com.project.gymtopia.member.repository.MediaRepository;
 import com.project.gymtopia.member.repository.MemberRepository;
+import com.project.gymtopia.member.repository.RegisterRepository;
 import com.project.gymtopia.trainer.data.entity.FeedBack;
 import com.project.gymtopia.trainer.data.entity.Management;
 import com.project.gymtopia.trainer.data.entity.Trainer;
@@ -20,6 +22,7 @@ import com.project.gymtopia.trainer.data.model.FeedbackForm;
 import com.project.gymtopia.trainer.data.model.JournalList;
 import com.project.gymtopia.trainer.data.model.MemberListResponse;
 import com.project.gymtopia.trainer.data.model.MissionForm;
+import com.project.gymtopia.trainer.data.model.RegisterManagement;
 import com.project.gymtopia.trainer.repository.FeedBackRepository;
 import com.project.gymtopia.trainer.repository.ManagementRepository;
 import com.project.gymtopia.trainer.repository.TrainerRepository;
@@ -47,6 +50,8 @@ class TrainerManagementServiceTest {
 
   @Mock
   private ManagementRepository managementRepository;
+  @Mock
+  private RegisterRepository registerRepository;
 
   @Mock
   private MemberRepository memberRepository;
@@ -62,17 +67,19 @@ class TrainerManagementServiceTest {
   private TrainerManagementServiceImpl trainerManagementService;
 
 
-  String email;
-  Trainer trainer;
-  Member member;
-  Management management;
-  List<Journal> journalList = new ArrayList<>();
-  Mission mission;
-  Journal journal;
-  FeedBack feedBack;
-  List<Media> mediaList = new ArrayList<>();
-  FeedbackForm feedbackForm;
-  MissionForm missionForm;
+  private String email;
+  private Trainer trainer;
+  private Member member;
+  private Management management;
+  private final List<Journal> journalList = new ArrayList<>();
+  private Mission mission;
+  private Journal journal;
+  private FeedBack feedBack;
+  private List<Media> mediaList = new ArrayList<>();
+  private FeedbackForm feedbackForm;
+  private MissionForm missionForm;
+  private Register register;
+  private RegisterManagement registerManagement;
 
   @BeforeEach
   void setUp() {
@@ -144,9 +151,22 @@ class TrainerManagementServiceTest {
     missionForm = MissionForm.builder()
         .title("Test mission form")
         .contents("Test mission form contents")
-        .months("2개월")
+        .period(2)
         .build();
 
+    LocalDate now = LocalDate.now();
+
+    register = Register.builder()
+        .id(1L)
+        .member(member)
+        .trainer(trainer)
+        .acceptYn(false)
+        .acceptedDate(now)
+        .build();
+
+    registerManagement = RegisterManagement.builder()
+        .accepted(true)
+        .build();
   }
 
   @Test
@@ -165,6 +185,7 @@ class TrainerManagementServiceTest {
     Assertions.assertEquals(member.getName(),
         memberListResponse.getManagementList().get(0).getMemberName());
   }
+
   @Test
   void 회원목록_불러오기_실패1() {
     //given
@@ -175,6 +196,7 @@ class TrainerManagementServiceTest {
     //then
     Assertions.assertEquals(ErrorCode.TRAINER_NOT_FOUND.getMessage(), exception.getMessage());
   }
+
   @Test
   void 회원목록_불러오기_실패2() {
     //given
@@ -189,6 +211,22 @@ class TrainerManagementServiceTest {
     //then
     Assertions.assertEquals(ErrorCode.NO_MEMBER_MANAGEMENT.getMessage(), exception.getMessage());
   }
+
+  @Test
+  void 회원목록_불러오기_실패3() {
+    //given
+    Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
+        .thenReturn(Optional.of(trainer));
+    Mockito.when(managementRepository.findAllByTrainer(Mockito.any(Trainer.class)))
+        .thenReturn(Optional.of(List.of()));
+
+    //when
+    Throwable exception = Assertions.assertThrows(
+        CustomException.class, () -> trainerManagementService.getMemberInfo(email));
+    //then
+    Assertions.assertEquals(ErrorCode.NO_MEMBER_MANAGEMENT.getMessage(), exception.getMessage());
+  }
+
   @Test
   void 특정회원의_일지리스트_가져오기_성공() {
     //when
@@ -201,7 +239,7 @@ class TrainerManagementServiceTest {
     Mockito.when(journalRepository.findAllByMember(member))
         .thenReturn(Optional.of(journalList));
     //given
-    JournalList journalListResult = trainerManagementService.getJournal(email, 1L);
+    JournalList journalListResult = trainerManagementService.getMissionJournal(email, 1L);
 
     //then
     Assertions.assertEquals("길동제자", journalListResult.getMemberName());
@@ -209,6 +247,7 @@ class TrainerManagementServiceTest {
         journalListResult.getMemberJournalInfoList().get(0).getJournalTitle());
     Assertions.assertEquals(1L, journalListResult.getMemberJournalInfoList().get(0).getJournalId());
   }
+
   @Test
   void 특정회원의_일지리스트_가져오기_실패1() {
     //given
@@ -216,10 +255,11 @@ class TrainerManagementServiceTest {
         .thenReturn(Optional.empty());
     //when
     Throwable exception = Assertions.assertThrows(CustomException.class,
-        () -> trainerManagementService.getJournal(email, 1L));
+        () -> trainerManagementService.getMissionJournal(email, 1L));
     //then
     Assertions.assertEquals(ErrorCode.TRAINER_NOT_FOUND.getMessage(), exception.getMessage());
   }
+
   @Test
   void 특정회원의_일지리스트_가져오기_실패2() {
     //given
@@ -229,10 +269,11 @@ class TrainerManagementServiceTest {
         .thenReturn(Optional.empty());
     //when
     Throwable exception = Assertions.assertThrows(CustomException.class,
-        () -> trainerManagementService.getJournal(email, 1L));
+        () -> trainerManagementService.getMissionJournal(email, 1L));
     //then
     Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
   }
+
   @Test
   void 특정회원의_일지리스트_가져오기_실패3() {
     //given
@@ -245,10 +286,11 @@ class TrainerManagementServiceTest {
         .thenReturn(Optional.empty());
     //when
     Throwable exception = Assertions.assertThrows(CustomException.class,
-        () -> trainerManagementService.getJournal(email, 1L));
+        () -> trainerManagementService.getMissionJournal(email, 1L));
     //then
     Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
   }
+
   @Test
   void 특정회원의_일지리스트_가져오기_실패4() {
     //given
@@ -262,10 +304,11 @@ class TrainerManagementServiceTest {
         .thenReturn(Optional.empty());
     //when
     Throwable exception = Assertions.assertThrows(CustomException.class,
-        () -> trainerManagementService.getJournal(email, 1L));
+        () -> trainerManagementService.getMissionJournal(email, 1L));
     //then
     Assertions.assertEquals(ErrorCode.JOURNAL_NOT_FOUND.getMessage(), exception.getMessage());
   }
+
   @Test
   void 특정회원의_특정일지정보_가져오기_성공() {
     //when
@@ -278,8 +321,8 @@ class TrainerManagementServiceTest {
         .thenReturn(Optional.of(journal));
     Mockito.when(feedBackRepository.findByJournal(Mockito.any(Journal.class)))
         .thenReturn(Optional.of(feedBack));
-    Mockito.when(mediaRepository.findALlByJournal(Mockito.any(Journal.class)))
-        .thenReturn(Optional.of(mediaList));
+    Mockito.when(mediaRepository.findAllByJournal(Mockito.any(Journal.class)))
+        .thenReturn(mediaList);
     //given
     JournalResponse journalResponse = trainerManagementService.getJournalInfo(email, 1L, 1L);
 
@@ -288,6 +331,7 @@ class TrainerManagementServiceTest {
     Assertions.assertEquals(JournalType.MISSION_JOURNAL, journalResponse.getJournalType());
     Assertions.assertEquals("Test journal contents", journalResponse.getContents());
   }
+
   @Test
   void 특정회원의_특정일지정보_실패1() {
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
@@ -299,6 +343,7 @@ class TrainerManagementServiceTest {
     Assertions.assertEquals(ErrorCode.TRAINER_NOT_FOUND.getMessage(), exception.getMessage());
 
   }
+
   @Test
   void 특정회원의_특정일지정보_실패2() {
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
@@ -311,6 +356,7 @@ class TrainerManagementServiceTest {
 
     Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
   }
+
   @Test
   void 특정회원의_특정일지정보_실패3() {
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
@@ -327,6 +373,7 @@ class TrainerManagementServiceTest {
     Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
 
   }
+
   @Test
   void 특정회원의_특정일지정보_실패4() {
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
@@ -345,6 +392,7 @@ class TrainerManagementServiceTest {
     Assertions.assertEquals(ErrorCode.JOURNAL_NOT_FOUND.getMessage(), exception.getMessage());
 
   }
+
   @Test
   void 특정회원의_특정일지정보_실패5() {
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
@@ -365,6 +413,29 @@ class TrainerManagementServiceTest {
     Assertions.assertEquals(ErrorCode.NOT_WRITER_OF_JOURNAL.getMessage(), exception.getMessage());
 
   }
+
+  @Test
+  void 특정회원의_특정일지정보_실패6() {
+    //given
+    Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
+        .thenReturn(Optional.of(trainer));
+    Mockito.when(memberRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(member));
+    Mockito.when(managementRepository.findByTrainerAndMember(trainer, member))
+        .thenReturn(Optional.of(Management.builder().build()));
+    Mockito.when(journalRepository.findById(Mockito.anyLong()))
+        .thenReturn(Optional.of(Journal.builder()
+            .id(1L)
+            .member(member)
+            .type(JournalType.DAILY_JOURNAL)
+            .build()));
+    //when
+    Throwable exception = Assertions.assertThrows(CustomException.class,
+        () -> trainerManagementService.getJournalInfo(email, 1L, 1L));
+    //then
+    Assertions.assertEquals(ErrorCode.WRONG_JOURNAL_TYPE.getMessage(), exception.getMessage());
+
+  }
+
   @Test
   void 피드백_작성_성공() {
     //given
@@ -372,12 +443,20 @@ class TrainerManagementServiceTest {
         .thenReturn(Optional.of(trainer));
     Mockito.when(journalRepository.findById(Mockito.anyLong()))
         .thenReturn(Optional.of(journal));
+
+    ArgumentCaptor<FeedBack> feedbackCaptor = ArgumentCaptor.forClass(FeedBack.class);
     //when
-    boolean result = trainerManagementService.writeFeedback(feedbackForm, email, 1L);
+    trainerManagementService.writeFeedback(feedbackForm, email, 1L);
 
     //then
-    Assertions.assertTrue(result);
+    Mockito.verify(feedBackRepository).save(feedbackCaptor.capture());
+    FeedBack savedFeedback = feedbackCaptor.getValue();
+
+    Assertions.assertEquals(savedFeedback.getTrainer(), trainer);
+    Assertions.assertEquals(savedFeedback.getJournal(), journal);
+    Assertions.assertEquals(savedFeedback.getContents(), feedbackForm.getContents());
   }
+
   @Test
   void 피드백_작성_실패1() {
     //given
@@ -390,6 +469,7 @@ class TrainerManagementServiceTest {
     //then
     Assertions.assertEquals(ErrorCode.TRAINER_NOT_FOUND.getMessage(), exception.getMessage());
   }
+
   @Test
   void 피드백_작성_실패2() {
     //given
@@ -403,6 +483,24 @@ class TrainerManagementServiceTest {
     //then
     Assertions.assertEquals(ErrorCode.JOURNAL_NOT_FOUND.getMessage(), exception.getMessage());
   }
+
+  @Test
+  void 피드백_작성_실패3() {
+    //given
+    Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
+        .thenReturn(Optional.of(trainer));
+    Mockito.when(journalRepository.findById(Mockito.anyLong()))
+        .thenReturn(Optional.of(Journal.builder()
+            .id(1L)
+            .type(JournalType.DAILY_JOURNAL)
+            .build()));
+    //when
+    Throwable exception = Assertions.assertThrows(CustomException.class,
+        () -> trainerManagementService.writeFeedback(feedbackForm, email, 1L));
+    //then
+    Assertions.assertEquals(ErrorCode.WRONG_JOURNAL_TYPE.getMessage(), exception.getMessage());
+  }
+
   @Test
   void 피드백_업데이트_성공() {
     //given
@@ -412,11 +510,19 @@ class TrainerManagementServiceTest {
         .thenReturn(Optional.of(journal));
     Mockito.when(feedBackRepository.findByJournal(Mockito.any(Journal.class)))
         .thenReturn(Optional.of(feedBack));
+
+    ArgumentCaptor<FeedBack> feedbackCaptor = ArgumentCaptor.forClass(FeedBack.class);
     //when
-    boolean result = trainerManagementService.updateFeedback(feedbackForm, email, 1L);
+    trainerManagementService.updateFeedback(feedbackForm, email, 1L);
     //then
-    Assertions.assertTrue(result);
+    Mockito.verify(feedBackRepository).save(feedbackCaptor.capture());
+    FeedBack updatedFeedback = feedbackCaptor.getValue();
+
+    Assertions.assertEquals(trainer, updatedFeedback.getTrainer());
+    Assertions.assertEquals(journal, updatedFeedback.getJournal());
+    Assertions.assertEquals(feedbackForm.getContents(), updatedFeedback.getContents());
   }
+
   @Test
   void 피드백_업데이트_실패1() {
     //given
@@ -429,6 +535,7 @@ class TrainerManagementServiceTest {
     Assertions.assertEquals(ErrorCode.TRAINER_NOT_FOUND.getMessage(), exception.getMessage());
 
   }
+
   @Test
   void 피드백_업데이트_실패2() {
     //given
@@ -443,6 +550,7 @@ class TrainerManagementServiceTest {
     Assertions.assertEquals(ErrorCode.JOURNAL_NOT_FOUND.getMessage(), exception.getMessage());
 
   }
+
   @Test
   void 피드백_업데이트_실패3() {
     //given
@@ -459,8 +567,9 @@ class TrainerManagementServiceTest {
     Assertions.assertEquals(ErrorCode.FEEDBACK_NOT_FOUND.getMessage(), exception.getMessage());
 
   }
+
   @Test
-  void 피드백_삭제_성공(){
+  void 피드백_삭제_성공() {
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
         .thenReturn(Optional.of(trainer));
     Mockito.when(journalRepository.findById(Mockito.anyLong()))
@@ -472,8 +581,9 @@ class TrainerManagementServiceTest {
 
     Assertions.assertTrue(result);
   }
+
   @Test
-  void 피드백_삭제_실패1(){
+  void 피드백_삭제_실패1() {
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
         .thenReturn(Optional.empty());
 
@@ -482,8 +592,9 @@ class TrainerManagementServiceTest {
 
     Assertions.assertEquals(ErrorCode.TRAINER_NOT_FOUND.getMessage(), exception.getMessage());
   }
+
   @Test
-  void 피드백_삭제_실패2(){
+  void 피드백_삭제_실패2() {
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
         .thenReturn(Optional.of(trainer));
     Mockito.when(journalRepository.findById(Mockito.anyLong()))
@@ -494,8 +605,9 @@ class TrainerManagementServiceTest {
 
     Assertions.assertEquals(ErrorCode.JOURNAL_NOT_FOUND.getMessage(), exception.getMessage());
   }
+
   @Test
-  void 피드백_삭제_실패3(){
+  void 피드백_삭제_실패3() {
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
         .thenReturn(Optional.of(trainer));
     Mockito.when(journalRepository.findById(Mockito.anyLong()))
@@ -508,8 +620,9 @@ class TrainerManagementServiceTest {
 
     Assertions.assertEquals(ErrorCode.FEEDBACK_NOT_FOUND.getMessage(), exception.getMessage());
   }
+
   @Test
-  void 피드백_삭제_실패4(){
+  void 피드백_삭제_실패4() {
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
         .thenReturn(Optional.of(trainer));
     Mockito.when(journalRepository.findById(Mockito.anyLong()))
@@ -526,7 +639,7 @@ class TrainerManagementServiceTest {
   }
 
   @Test
-  void 미션_부여_성공(){
+  void 미션_부여_성공() {
     //given
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
         .thenReturn(Optional.of(trainer));
@@ -551,7 +664,7 @@ class TrainerManagementServiceTest {
   }
 
   @Test
-  void 미션_부여_실패1(){
+  void 미션_부여_실패1() {
     //given
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
         .thenReturn(Optional.empty());
@@ -563,7 +676,7 @@ class TrainerManagementServiceTest {
   }
 
   @Test
-  void 미션_부여_실패2(){
+  void 미션_부여_실패2() {
     //given
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
         .thenReturn(Optional.of(trainer));
@@ -574,5 +687,74 @@ class TrainerManagementServiceTest {
         () -> trainerManagementService.giveMission(missionForm, email, 1L));
     //then
     Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
+  }
+
+  @Test
+  void 관리신청_수락처리_성공() {
+    //given
+    Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
+        .thenReturn(Optional.of(trainer));
+    Mockito.when(registerRepository.findById(Mockito.anyLong()))
+        .thenReturn(Optional.of(register));
+    //when
+    boolean isAccepted = trainerManagementService.manageRegister(email, 1L, registerManagement);
+    //then
+    Assertions.assertTrue(isAccepted);
+  }
+
+  @Test
+  void 관리신청_거절처리_성공() {
+    //given
+    Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
+        .thenReturn(Optional.of(trainer));
+    Mockito.when(registerRepository.findById(Mockito.anyLong()))
+        .thenReturn(Optional.of(register));
+
+    registerManagement.setAccepted(false);
+
+    //when
+    boolean isAccepted = trainerManagementService.manageRegister(email, 1L, registerManagement);
+    //then
+    Assertions.assertFalse(isAccepted);
+  }
+
+  @Test
+  void 관리신청_처리_실패1() {
+    //given
+    Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
+        .thenReturn(Optional.empty());
+    //when
+    Throwable exception = Assertions.assertThrows(CustomException.class,
+        () -> trainerManagementService.manageRegister(email, 1L, registerManagement));
+    //then
+    Assertions.assertEquals(ErrorCode.TRAINER_NOT_FOUND.getMessage(), exception.getMessage());
+  }
+
+  @Test
+  void 관리신청_처리_실패2() {
+    //given
+    Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
+        .thenReturn(Optional.of(trainer));
+    Mockito.when(registerRepository.findById(Mockito.anyLong()))
+        .thenReturn(Optional.empty());
+    //when
+    Throwable exception = Assertions.assertThrows(CustomException.class,
+        () -> trainerManagementService.manageRegister(email, 1L, registerManagement));
+    //then
+    Assertions.assertEquals(ErrorCode.REGISTER_NOT_FOUND.getMessage(), exception.getMessage());
+  }
+
+  @Test
+  void 관리신청_처리_실패3() {
+    //given
+    Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
+        .thenReturn(Optional.of(Trainer.builder().id(2L).build()));
+    Mockito.when(registerRepository.findById(Mockito.anyLong()))
+        .thenReturn(Optional.of(register));
+    //when
+    Throwable exception = Assertions.assertThrows(CustomException.class,
+        () -> trainerManagementService.manageRegister(email, 1L, registerManagement));
+    //then
+    Assertions.assertEquals(ErrorCode.INVALID_REGISTER.getMessage(), exception.getMessage());
   }
 }

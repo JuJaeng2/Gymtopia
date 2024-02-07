@@ -42,9 +42,9 @@ public class TrainerAuthServiceTest {
   @InjectMocks
   private TrainerAuthServiceImpl trainerAuthService;
 
-  Trainer trainer;
-  UserSignInForm signInForm;
-  UserSignUpForm userSignUpForm;
+  private Trainer trainer;
+  private UserSignInForm signInForm;
+  private UserSignUpForm userSignUpForm;
 
   @BeforeEach
   public void setUp() {

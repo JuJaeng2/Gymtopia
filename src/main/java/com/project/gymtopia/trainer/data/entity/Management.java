@@ -35,6 +35,7 @@ public class Management {
   private Trainer trainer;
 
   private LocalDate registerDate;
+  private LocalDate startDate;
   private LocalDate endDate;
 
 

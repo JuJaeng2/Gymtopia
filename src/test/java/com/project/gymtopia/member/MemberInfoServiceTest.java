@@ -33,8 +33,8 @@ public class MemberInfoServiceTest {
   @InjectMocks
   MemberInfoServiceImpl memberInfoService;
 
-  Member member;
-  MemberUpdate memberUpdate;
+  private Member member;
+  private MemberUpdate memberUpdate;
 
   @BeforeEach
   void setUp() {

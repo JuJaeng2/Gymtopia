@@ -5,6 +5,7 @@ import com.project.gymtopia.trainer.data.model.FeedbackForm;
 import com.project.gymtopia.trainer.data.model.JournalList;
 import com.project.gymtopia.trainer.data.model.MemberListResponse;
 import com.project.gymtopia.trainer.data.model.MissionForm;
+import com.project.gymtopia.trainer.data.model.RegisterManagement;
 import com.project.gymtopia.trainer.service.TrainerManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,7 +51,7 @@ public class TrainerManagementController {
   ){
 
     String email = authentication.getName();
-    JournalList journalList  = trainerManagementService.getJournal(email, memberId);
+    JournalList journalList  = trainerManagementService.getMissionJournal(email, memberId);
 
     return ResponseEntity.ok(journalList);
   }
@@ -64,7 +65,6 @@ public class TrainerManagementController {
       Authentication authentication,
       @PathVariable(value = "memberId") long memberId,
       @PathVariable(value = "journalId") long journalId
-
   ){
 
     String email = authentication.getName();
@@ -76,7 +76,7 @@ public class TrainerManagementController {
   /**
    * 회원의 일지에대한 피드백을 작성하는 API
    */
-  @PostMapping("management/journal/{journalId}")
+  @PostMapping("management/feedback/journal/{journalId}")
   public ResponseEntity<?> feedback(
       Authentication authentication,
       @PathVariable(value = "journalId") long journalId,
@@ -84,19 +84,15 @@ public class TrainerManagementController {
   ){
 
     String email = authentication.getName();
-    boolean successFeedback = trainerManagementService.writeFeedback(feedBackForm, email, journalId);
+    trainerManagementService.writeFeedback(feedBackForm, email, journalId);
 
-    if (successFeedback){
-      return ResponseEntity.ok("피드백 작성이 완료되었습니다.");
-    }else{
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("피드백 작성을 실패했습니다. 다시 작성해주세요");
-    }
+    return ResponseEntity.ok("피드백 작성이 완료되었습니다.");
   }
 
   /**
    * 작성한 피드백을 수정하는 API
    */
-  @PutMapping("/management/journal/{journalId}")
+  @PutMapping("/management/feedback/journal/{journalId}")
   public ResponseEntity<?> updateFeedback(
       Authentication authentication,
       @PathVariable(value = "journalId") long journalId,
@@ -104,19 +100,17 @@ public class TrainerManagementController {
   ){
 
     String email = authentication.getName();
-    boolean updateFeedback = trainerManagementService.updateFeedback(feedbackForm, email, journalId);
+//    boolean updateFeedback = trainerManagementService.updateFeedback(feedbackForm, email, journalId);
 
-    if (updateFeedback){
-      return ResponseEntity.ok("피드백 작성이 완료되었습니다.");
-    }else{
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("피드백 작성을 실패했습니다. 다시 작성해주세요");
-    }
+    trainerManagementService.updateFeedback(feedbackForm, email, journalId);
+
+    return ResponseEntity.ok("피드백을 수정하였습니다.");
   }
 
   /**
    * 작성한 피드백을 삭제하는 API
    */
-  @DeleteMapping("/management/journal/{journalId}")
+  @DeleteMapping("/management/feedback/journal/{journalId}")
   public ResponseEntity<?> deleteFeedback(
       Authentication authentication,
       @PathVariable(value = "journalId") long journalId
@@ -144,6 +138,25 @@ public class TrainerManagementController {
     trainerManagementService.giveMission(missionForm, email, memberId);
 
     return ResponseEntity.ok("미션을 성공적으로 전달했습니다.");
+
+  }
+
+  /**
+   * 받은 운동관리 신청을 처리하는 API
+   */
+  @PostMapping("/management/register/{registerId}")
+  public ResponseEntity<?> manageRegister(
+      Authentication authentication,
+      @PathVariable(value = "registerId") long registerId,
+      @RequestBody RegisterManagement registerManagement
+  ){
+    String email = authentication.getName();
+    boolean isAccepted = trainerManagementService.manageRegister(email, registerId, registerManagement);
+    if (isAccepted) {
+      return ResponseEntity.ok("요청을 '수락'처리 하였습니다.");
+    }else {
+      return ResponseEntity.ok("요청을 '거절'처리 하였습니다");
+    }
 
   }
 
