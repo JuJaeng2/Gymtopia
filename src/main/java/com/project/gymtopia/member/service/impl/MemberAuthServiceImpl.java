@@ -1,6 +1,6 @@
 package com.project.gymtopia.member.service.impl;
 
-import static com.project.gymtopia.exception.ErrorCode.USER_NOT_FOUND;
+import static com.project.gymtopia.exception.ErrorCode.MEMBER_NOT_FOUND;
 import static com.project.gymtopia.exception.ErrorCode.WRONG_PASSWORD;
 
 import com.project.gymtopia.common.data.model.TokenResponse;
@@ -32,7 +32,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
   public MemberDto authenticate(String email, String password) {
 
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
     if (!passwordEncoder.matches(password, member.getPassword())) {
       throw new CustomException(WRONG_PASSWORD);

@@ -1,6 +1,6 @@
 package com.project.gymtopia.member.service.impl;
 
-import static com.project.gymtopia.exception.ErrorCode.USER_NOT_FOUND;
+import static com.project.gymtopia.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.member.data.entity.Member;
@@ -23,7 +23,7 @@ public class MemberInfoServiceImpl implements MemberInfoService {
   public MemberResponse getMemberInformation(String email) {
 
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
     return MemberResponse.builder()
         .name(member.getName())
@@ -38,7 +38,7 @@ public class MemberInfoServiceImpl implements MemberInfoService {
   public MemberResponse updateInfo(MemberUpdate memberUpdate, String email) {
 
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
     member.setNumber(memberUpdate.getNumber());
     member.setPassword(passwordEncoder.encode(memberUpdate.getPassword()));

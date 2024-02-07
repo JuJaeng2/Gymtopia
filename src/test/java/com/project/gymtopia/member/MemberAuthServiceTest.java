@@ -118,7 +118,7 @@ public class MemberAuthServiceTest {
     //given
 
     Mockito.when(memberRepository.findByEmail(Mockito.anyString())).thenThrow(new CustomException(
-        ErrorCode.USER_NOT_FOUND));
+        ErrorCode.MEMBER_NOT_FOUND));
     //when
 
     Throwable exception = Assertions.assertThrows(CustomException.class, () -> memberAuthService.authenticate(
@@ -126,7 +126,7 @@ public class MemberAuthServiceTest {
 
     //then
 
-    Assertions.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), exception.getMessage());
+    Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
 
   }
 

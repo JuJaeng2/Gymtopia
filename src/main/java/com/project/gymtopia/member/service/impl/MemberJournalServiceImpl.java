@@ -2,7 +2,7 @@ package com.project.gymtopia.member.service.impl;
 
 import static com.project.gymtopia.exception.ErrorCode.JOURNAL_NOT_FOUND;
 import static com.project.gymtopia.exception.ErrorCode.NOT_SAME_MEMBER_AND_WRITER;
-import static com.project.gymtopia.exception.ErrorCode.USER_NOT_FOUND;
+import static com.project.gymtopia.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
@@ -31,6 +31,7 @@ import com.project.gymtopia.member.service.MemberJournalService;
 import com.project.gymtopia.trainer.data.entity.FeedBack;
 import com.project.gymtopia.trainer.data.model.FeedBackDto;
 import com.project.gymtopia.trainer.repository.FeedBackRepository;
+import com.project.gymtopia.util.MediaUtil;
 import com.project.gymtopia.util.MultipartUtil;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,31 +64,32 @@ public class MemberJournalServiceImpl implements MemberJournalService {
   public boolean uploadJournal(
       JournalForm journalForm,
       String email,
-      List<MultipartFile> imageFileList,
+      List<MultipartFile> imageMultipartFileList,
       MultipartFile videoMultipartFile) throws IOException {
 
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
-    // 받은 미션이 있는지 확인 후 타입 설정
-    Optional<Mission> optionalMission = checkMission(member);
 
     // 저널 내용 저장
     Journal journal = saveJournalDetail(
         journalForm.getTitle(),
         journalForm.getContents(),
-        optionalMission,
+        Optional.empty(),
         member);
 
     // S3 이미지 저장
     List<String> mediaFileUrlList = new ArrayList<>();
+    if (!videoMultipartFile.isEmpty()) {
+      MediaUploadState videoUploadState = uploadFileToS3(videoMultipartFile);
+      checkUploadState(videoUploadState, mediaFileUrlList);
+    }
 
-    MediaUploadState videoUploadState = uploadFileToS3(videoMultipartFile);
-    checkUploadState(videoUploadState, mediaFileUrlList);
-
-    for (MultipartFile imageMultipartFile : imageFileList){
-      MediaUploadState imageUploadState = uploadFileToS3(imageMultipartFile);
-      checkUploadState(imageUploadState, mediaFileUrlList);
+    if (!imageMultipartFileList.isEmpty()) {
+      for (MultipartFile imageMultipartFile : imageMultipartFileList) {
+        MediaUploadState imageUploadState = uploadFileToS3(imageMultipartFile);
+        checkUploadState(imageUploadState, mediaFileUrlList);
+      }
     }
 
     // 파일 저장
@@ -99,10 +102,51 @@ public class MemberJournalServiceImpl implements MemberJournalService {
     return true;
   }
 
+  @Override
+  public boolean uploadJournal(JournalForm journalForm, String email, long missionId,
+      List<MultipartFile> imageMultipartFileList, MultipartFile videoMultipartFile) throws IOException {
+
+    Member member = memberRepository.findByEmail(email)
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+    // 받은 미션이 있는지 확인 후 타입 설정
+    Mission mission = checkMission(missionId);
+
+    // 저널 내용 저장
+    Journal journal = saveJournalDetail(
+        journalForm.getTitle(),
+        journalForm.getContents(),
+        Optional.of(mission),
+        member);
+
+    // S3 이미지 저장
+    List<String> mediaFileUrlList = new ArrayList<>();
+    if (!videoMultipartFile.isEmpty()) {
+      MediaUploadState videoUploadState = uploadFileToS3(videoMultipartFile);
+      checkUploadState(videoUploadState, mediaFileUrlList);
+    }
+
+    if (!imageMultipartFileList.isEmpty()) {
+      for (MultipartFile imageMultipartFile : imageMultipartFileList) {
+        MediaUploadState imageUploadState = uploadFileToS3(imageMultipartFile);
+        checkUploadState(imageUploadState, mediaFileUrlList);
+      }
+    }
+
+    // 파일 저장
+    for (String mediaFileUrl : mediaFileUrlList) {
+      saveImageUrl(journal, mediaFileUrl);
+    }
+
+    //TODO: 일지 저장이 완료된 후 트레이너에게 알림 보내기
+
+    return false;
+  }
+
   private void checkUploadState(MediaUploadState mediaUploadState, List<String> mediaFileUrlList)
       throws ImageUploadException {
     String url = mediaUploadState.getFileUrl();
-    if (!mediaUploadState.isSuccess() && !mediaFileUrlList.isEmpty()){
+    if (!mediaUploadState.isSuccess() && !mediaFileUrlList.isEmpty()) {
       int idx = url.lastIndexOf("/");
       String fileName = url.substring(idx + 1);
       deleteImage(fileName);
@@ -120,7 +164,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
 
     // 해당 유저가 존재하는지 체크
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
     // 저널을 쓴 사람이 요청한 사람과 동일한지 확인하기
     Journal journal = journalRepository.findById(journalId)
@@ -133,8 +177,8 @@ public class MemberJournalServiceImpl implements MemberJournalService {
     // JournalResponse 리턴
 
     Optional<List<Media>> optionalMediaList = mediaRepository.findALlByJournal(journal);
-    MediaResponse mediaResponse = optionalMediaList.isPresent() ? classifyMedia(optionalMediaList.get()) : null;
-
+    MediaResponse mediaResponse =
+        optionalMediaList.isPresent() ? MediaUtil.classifyMedia(optionalMediaList.get()) : null;
 
     FeedBackDto feedBackDto;
     Optional<FeedBack> optionalFeedBack = feedBackRepository.findByJournal(journal);
@@ -163,11 +207,12 @@ public class MemberJournalServiceImpl implements MemberJournalService {
    * 일지 업데이트 메소드
    */
   @Override
-  public boolean updateJournal(JournalForm journalForm, String email, long journalId, List<MultipartFile> imageMultipartFileList, MultipartFile videoMultipartFile)
+  public boolean updateJournal(JournalForm journalForm, String email, long journalId,
+      List<MultipartFile> imageMultipartFileList, MultipartFile videoMultipartFile)
       throws ImageUploadException {
 
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
     Journal journal = journalRepository.findById(journalId)
         .orElseThrow(() -> new CustomException(JOURNAL_NOT_FOUND));
@@ -179,7 +224,6 @@ public class MemberJournalServiceImpl implements MemberJournalService {
 
     List<Media> mediaList = mediaRepository.findALlByJournal(journal)
         .orElseThrow(() -> new CustomException(JOURNAL_NOT_FOUND));
-
 
     // Journal 업데이트
     journal.setTitle(journalForm.getTitle());
@@ -198,13 +242,13 @@ public class MemberJournalServiceImpl implements MemberJournalService {
     // S3에 파일 저장, Media엔티티 저장
     List<String> mediaFileUrlList = new ArrayList<>();
 
-    if (!videoMultipartFile.isEmpty()){
+    if (!videoMultipartFile.isEmpty()) {
       MediaUploadState videoUploadState = uploadFileToS3(videoMultipartFile);
       checkUploadState(videoUploadState, mediaFileUrlList);
     }
 
-    if (!imageMultipartFileList.isEmpty() ){
-      for (MultipartFile imageMultipartFile : imageMultipartFileList){
+    if (!imageMultipartFileList.isEmpty()) {
+      for (MultipartFile imageMultipartFile : imageMultipartFileList) {
         MediaUploadState imageUploadState = uploadFileToS3(imageMultipartFile);
         checkUploadState(imageUploadState, mediaFileUrlList);
       }
@@ -224,20 +268,19 @@ public class MemberJournalServiceImpl implements MemberJournalService {
   public ResponseMessage deleteJournal(long journalId, String email) {
 
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
-    Journal journal  = journalRepository.findById(journalId)
+    Journal journal = journalRepository.findById(journalId)
         .orElseThrow(() -> new CustomException(JOURNAL_NOT_FOUND));
 
-    if (!journal.getMember().getEmail().equals(member.getEmail())){
+    if (!journal.getMember().getEmail().equals(member.getEmail())) {
       throw new CustomException(NOT_SAME_MEMBER_AND_WRITER);
     }
 
     Optional<List<Media>> optionalMediaList = mediaRepository.findALlByJournal(journal);
-    if (optionalMediaList.isPresent()){
+    if (optionalMediaList.isPresent()) {
       int idx = 0;
-      List<Media> mediaList = optionalMediaList.get();
-      for (Media media : mediaList){
+      for (Media media : optionalMediaList.get()) {
         idx = media.getUrl().lastIndexOf("/");
         deleteImage(media.getUrl().substring(idx + 1));
       }
@@ -252,39 +295,20 @@ public class MemberJournalServiceImpl implements MemberJournalService {
         .build();
   }
 
-  private MediaResponse classifyMedia(List<Media> mediaList) {
-
-    List<String> imageUrlList = new ArrayList<>();
-    String videoUrl = null;
-
-    for (Media media : mediaList) {
-      String url = media.getUrl();
-      int idx = url.lastIndexOf(".");
-      String extension = url.substring(idx + 1);
-      if (extension.equals("mp4")) {
-        videoUrl = url;
-        continue;
-      }
-      imageUrlList.add(url);
-    }
-
-    return MediaResponse.builder()
-        .imageUrlList(imageUrlList)
-        .videoUrl(videoUrl)
-        .build();
-  }
 
   /**
    * 일지를 repository에 저장하는 메소드
    */
-  private Journal saveJournalDetail(String title, String contents,
-      Optional<Mission> optionalMission, Member member) {
+  private Journal saveJournalDetail(String title, String contents, Optional<Mission> optionalMission
+      ,Member member) {
 
-    JournalType journalType = optionalMission.isEmpty() ? JournalType.DAILY_JOURNAL : JournalType.MISSION_JOURNAL;
+    Pair<JournalType, Mission> journalTypeAndMission =
+        optionalMission.map(mission -> Pair.of(JournalType.MISSION_JOURNAL,mission))
+            .orElseGet(() -> Pair.of(JournalType.DAILY_JOURNAL, null));
 
     Journal newJournal = Journal.builder()
-        .type(journalType)
-        .mission(journalType == JournalType.MISSION_JOURNAL ? optionalMission.get() : null)
+        .type(journalTypeAndMission.getFirst())
+        .mission(journalTypeAndMission.getSecond())
         .title(title)
         .contents(contents)
         .member(member)
@@ -297,11 +321,11 @@ public class MemberJournalServiceImpl implements MemberJournalService {
   /**
    * 회원에게 부여된 미션이 있는지 확인하는 메소드
    */
-  private Optional<Mission> checkMission(Member member) {
+  private Mission checkMission(long missionId) {
 
-    Optional<Mission> optionalMission =
-        missionRepository.findByMemberAndState(member, MissionState.PROGRESSING);
-    return optionalMission;
+    return missionRepository.findByIdAndState(missionId, MissionState.PROGRESSING)
+        .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
+
   }
 
 

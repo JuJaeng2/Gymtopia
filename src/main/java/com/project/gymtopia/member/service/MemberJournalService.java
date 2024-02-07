@@ -10,11 +10,25 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MemberJournalService {
 
-  boolean uploadJournal(JournalForm journalForm, String email, List<MultipartFile> imageFileList, MultipartFile videoFile) throws IOException;
+  /**
+   * daily journal 을 작성할 때 사용
+   */
+  boolean uploadJournal(JournalForm journalForm, String email,
+      List<MultipartFile> imageMultipartFileList, MultipartFile videoMultipartFile)
+      throws IOException;
+
+  /**
+   * mission journal 을 작성할 때 사용
+   */
+  boolean uploadJournal(JournalForm journalForm, String email, long missionId,
+      List<MultipartFile> imageMultipartFileList, MultipartFile videoMultipartFile)
+      throws IOException;
+
 
   JournalResponse getJournalDetail(long journalId, String email);
 
-  boolean updateJournal(JournalForm journalForm, String email, long journalId, List<MultipartFile> imageFileList, MultipartFile videoFile)
+  boolean updateJournal(JournalForm journalForm, String email, long journalId,
+      List<MultipartFile> imageFileList, MultipartFile videoFile)
       throws ImageUploadException;
 
   ResponseMessage deleteJournal(long journalId, String email);
