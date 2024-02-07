@@ -28,7 +28,7 @@ public class TrainerAuthServiceImpl implements TrainerAuthService {
   public TrainerDto authenticate(String email, String password) {
 
     Trainer trainer = trainerRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     if (!passwordEncoder.matches(password, trainer.getPassword())) {
       throw new CustomException(ErrorCode.WRONG_PASSWORD);
@@ -49,6 +49,7 @@ public class TrainerAuthServiceImpl implements TrainerAuthService {
         UserDto.builder()
             .id(trainerDto.getId())
             .name(trainerDto.getName())
+            .email(trainerDto.getEmail())
             .build(),
         trainerDto.getRole());
   }

@@ -1,6 +1,6 @@
 package com.project.gymtopia.member.service.impl;
 
-import static com.project.gymtopia.exception.ErrorCode.USER_NOT_FOUND;
+import static com.project.gymtopia.exception.ErrorCode.MEMBER_NOT_FOUND;
 import static com.project.gymtopia.exception.ErrorCode.WRONG_PASSWORD;
 
 import com.project.gymtopia.common.data.model.TokenResponse;
@@ -32,7 +32,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
   public MemberDto authenticate(String email, String password) {
 
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
     if (!passwordEncoder.matches(password, member.getPassword())) {
       throw new CustomException(WRONG_PASSWORD);
@@ -49,14 +49,17 @@ public class MemberAuthServiceImpl implements MemberAuthService {
   @Override
   public TokenResponse createToken(MemberDto memberDto) {
 
-    return jwtToken.createToken(new UserDto(memberDto.getId(), memberDto.getName()),
+    return jwtToken.createToken(
+        UserDto.builder()
+            .name(memberDto.getName())
+            .email(memberDto.getEmail())
+            .build(),
         memberDto.getRole());
   }
 
   @Override
   public MemberResponse signUp(UserSignUpForm userSignUpForm) {
 
-    System.out.println("이메일이 존재 여부 >>>" + isEmailExist(userSignUpForm.getEmail()));
     if (isEmailExist(userSignUpForm.getEmail())) {
       throw new CustomException(ErrorCode.REGISTERED_EMAIL);
     }
