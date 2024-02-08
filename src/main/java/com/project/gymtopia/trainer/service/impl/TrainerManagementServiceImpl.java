@@ -9,11 +9,13 @@ import com.project.gymtopia.exception.ErrorCode;
 import com.project.gymtopia.member.data.entity.Journal;
 import com.project.gymtopia.member.data.entity.Media;
 import com.project.gymtopia.member.data.entity.Member;
+import com.project.gymtopia.member.data.entity.Register;
 import com.project.gymtopia.member.data.model.JournalResponse;
 import com.project.gymtopia.member.data.model.MediaResponse;
 import com.project.gymtopia.member.repository.JournalRepository;
 import com.project.gymtopia.member.repository.MediaRepository;
 import com.project.gymtopia.member.repository.MemberRepository;
+import com.project.gymtopia.member.repository.RegisterRepository;
 import com.project.gymtopia.trainer.data.entity.FeedBack;
 import com.project.gymtopia.trainer.data.entity.Management;
 import com.project.gymtopia.trainer.data.entity.Trainer;
@@ -24,15 +26,17 @@ import com.project.gymtopia.trainer.data.model.ManagementDto;
 import com.project.gymtopia.trainer.data.model.MemberJournalInfo;
 import com.project.gymtopia.trainer.data.model.MemberListResponse;
 import com.project.gymtopia.trainer.data.model.MissionForm;
+import com.project.gymtopia.trainer.data.model.RegisterManagement;
 import com.project.gymtopia.trainer.repository.FeedBackRepository;
 import com.project.gymtopia.trainer.repository.ManagementRepository;
 import com.project.gymtopia.trainer.repository.TrainerRepository;
 import com.project.gymtopia.trainer.service.TrainerManagementService;
 import com.project.gymtopia.util.MediaUtil;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +51,7 @@ public class TrainerManagementServiceImpl implements TrainerManagementService {
   private final MediaRepository mediaRepository;
   private final FeedBackRepository feedBackRepository;
   private final MissionRepository missionRepository;
+  private final RegisterRepository registerRepository;
 
   @Override
   public MemberListResponse getMemberInfo(String email) {
@@ -56,19 +61,13 @@ public class TrainerManagementServiceImpl implements TrainerManagementService {
 
     List<Management> managementList = managementRepository.findAllByTrainer(trainer)
         .orElseThrow(() -> new CustomException(ErrorCode.NO_MEMBER_MANAGEMENT));
-
-    List<ManagementDto> managementDtoList = new ArrayList<>();
-    for (Management management : managementList){
-      managementDtoList.add(ManagementDto.builder()
-              .memberName(management.getMember().getName())
-              .email(management.getMember().getEmail())
-              .number(management.getMember().getNumber())
-              .address(management.getMember().getAddress())
-              .birth(management.getMember().getBirth())
-              .registerDate(management.getRegisterDate())
-              .endDate(management.getEndDate())
-          .build());
+    if (managementList.isEmpty()){
+      throw new CustomException(ErrorCode.NO_MEMBER_MANAGEMENT);
     }
+
+    List<ManagementDto> managementDtoList = managementList.stream()
+        .map(management -> ManagementDto.from(management))
+        .toList();
 
     return MemberListResponse.builder()
         .trainerName(trainer.getName())
@@ -77,7 +76,7 @@ public class TrainerManagementServiceImpl implements TrainerManagementService {
   }
 
   @Override
-  public JournalList getJournal(String email, long memberId) {
+  public JournalList getMissionJournal(String email, long memberId) {
 
     Trainer trainer = trainerRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(ErrorCode.TRAINER_NOT_FOUND));
@@ -88,16 +87,19 @@ public class TrainerManagementServiceImpl implements TrainerManagementService {
     managementRepository.findByTrainerAndMember(trainer, member)
         .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-    List<Journal> journalList = journalRepository.findAllByMember(member)
-        .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
+    List<Journal> journalList = journalRepository.findAllByMemberAndType(member,
+        JournalType.MISSION_JOURNAL);
+
+    if (journalList.isEmpty()){
+      throw new CustomException(ErrorCode.JOURNAL_NOT_FOUND);
+    }
 
     List<MemberJournalInfo> memberJournalInfoList = journalList.stream()
-        .filter(journal -> journal.getType().equals(JournalType.MISSION_JOURNAL))
         .map(journal -> MemberJournalInfo.builder()
             .journalId(journal.getId())
             .journalTitle(journal.getTitle())
             .build())
-        .toList();
+        .collect(Collectors.toList());
 
     return JournalList.builder()
         .memberName(member.getName())
@@ -123,35 +125,35 @@ public class TrainerManagementServiceImpl implements TrainerManagementService {
     if (!journal.getMember().getEmail().equals(member.getEmail())){
       throw new CustomException(ErrorCode.NOT_WRITER_OF_JOURNAL);
     }
+    if (!journal.getType().equals(JournalType.MISSION_JOURNAL)){
+      throw new CustomException(ErrorCode.WRONG_JOURNAL_TYPE);
+    }
 
     Optional<FeedBack> optionalFeedBack = feedBackRepository.findByJournal(journal);
     FeedBackDto feedBackDto =
         optionalFeedBack.isPresent() ? FeedBackDto.from(optionalFeedBack.get()) : null;
 
-    Optional<List<Media>> optionalMediaList = mediaRepository.findALlByJournal(journal);
+//    Optional<List<Media>> optionalMediaList = mediaRepository.findAllByJournal(journal);
+    List<Media> mediaList = mediaRepository.findAllByJournal(journal);
     MediaResponse mediaResponse =
-        optionalMediaList.isPresent() ? MediaUtil.classifyMedia(optionalMediaList.get()) : null;
+        mediaList.isEmpty() ? null : MediaUtil.classifyMedia(mediaList);
 
-    return JournalResponse.builder()
-        .title(journal.getTitle())
-        .contents(journal.getContents())
-        .journalType(journal.getType())
-        .mission(journal.getMission())
-        .feedBackDto(feedBackDto)
-        .mediaResponse(mediaResponse)
-        .createDateTime(journal.getCreateDateTime())
-        .build();
+    return JournalResponse.from(journal, feedBackDto, mediaResponse);
 
   }
 
   @Override
-  public boolean writeFeedback(FeedbackForm feedBackForm, String email, long journalId) {
+  public void writeFeedback(FeedbackForm feedBackForm, String email, long journalId) {
 
     Trainer trainer = trainerRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(ErrorCode.TRAINER_NOT_FOUND));
 
     Journal journal = journalRepository.findById(journalId)
         .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
+
+    if (!journal.getType().equals(JournalType.MISSION_JOURNAL)){
+      throw new CustomException(ErrorCode.WRONG_JOURNAL_TYPE);
+    }
 
     FeedBack feedBack = FeedBack.builder()
         .contents(feedBackForm.getContents())
@@ -163,12 +165,10 @@ public class TrainerManagementServiceImpl implements TrainerManagementService {
 
     journal.getMission().setState(feedBackForm.getState());
     journalRepository.save(journal);
-
-    return true;
   }
 
   @Override
-  public boolean updateFeedback(FeedbackForm feedbackForm, String email, long journalId) {
+  public void updateFeedback(FeedbackForm feedbackForm, String email, long journalId) {
 
     Trainer trainer = trainerRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(ErrorCode.TRAINER_NOT_FOUND));
@@ -178,17 +178,16 @@ public class TrainerManagementServiceImpl implements TrainerManagementService {
 
     FeedBack feedBack = feedBackRepository.findByJournal(journal)
         .orElseThrow(() -> new CustomException(ErrorCode.FEEDBACK_NOT_FOUND));
-    if (!feedBack.getTrainer().equals(trainer)){
+    if (!feedBack.getTrainer().equals(trainer)) {
       throw new CustomException(ErrorCode.NOT_WRITER_OF_FEEDBACK);
     }
+
 
     feedBack.setContents(feedbackForm.getContents());
     feedBackRepository.save(feedBack);
 
     journal.getMission().setState(feedbackForm.getState());
     journalRepository.save(journal);
-
-    return true;
   }
 
   @Override
@@ -218,24 +217,52 @@ public class TrainerManagementServiceImpl implements TrainerManagementService {
     Member member = memberRepository.findById(memberId)
         .orElseThrow( () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
+    LocalDateTime now = LocalDateTime.now();
+
     Mission newMission = Mission.builder()
         .member(member)
         .trainer(trainer)
         .title(missionForm.getTitle())
         .contents(missionForm.getContents())
         .state(MissionState.PROGRESSING)
-        .expirationDateTime(getExpirationDateTime(missionForm.getMonths()))
+        .createDateTime(now)
+        .expirationDateTime(now.plusDays(missionForm.getPeriod()))
         .build();
 
     missionRepository.save(newMission);
   }
 
-  private LocalDateTime getExpirationDateTime(String months){
-    int idx = months.lastIndexOf("개월");
-    int period = Integer.parseInt(months.substring(0, idx));
+  @Override
+  public boolean manageRegister(String email, long registerId, RegisterManagement registerManagement) {
+    Trainer trainer = trainerRepository.findByEmail(email)
+        .orElseThrow(() -> new CustomException(ErrorCode.TRAINER_NOT_FOUND));
 
-    return LocalDateTime.now().plusMonths(period);
+    Register register = registerRepository.findById(registerId)
+        .orElseThrow(() -> new CustomException(ErrorCode.REGISTER_NOT_FOUND));
+
+    if (register.isAcceptYn() == registerManagement.isAccepted()){
+      throw new CustomException(ErrorCode.PROCESSED_REQUEST);
+    }
+
+    if (!register.getTrainer().equals(trainer)){
+      throw new CustomException(ErrorCode.INVALID_REGISTER);
+    }
+
+    Management newManagement = Management.builder()
+        .member(register.getMember())
+        .trainer(trainer)
+        .registerDate(register.getRegisterDate())
+        .startDate(register.getStartDate())
+        .endDate(register.getEndDate())
+            .build();
+    managementRepository.save(newManagement);
+
+
+    register.setAcceptYn(registerManagement.isAccepted());
+    register.setAcceptedDate(LocalDate.now());
+
+    registerRepository.save(register);
+
+    return registerManagement.isAccepted();
   }
-
-
 }

@@ -29,9 +29,9 @@ public class TrainerInfoServiceTest {
   @InjectMocks
   TrainerInfoServiceImpl trainerInfoService;
 
-  Trainer trainer;
-  TrainerUpdate trainerUpdate;
-  Trainer updatedTrainer;
+  private Trainer trainer;
+  private TrainerUpdate trainerUpdate;
+  private Trainer updatedTrainer;
 
   @BeforeEach
   void setUp() {

@@ -22,6 +22,7 @@ public class TrainerInfoServiceImpl implements TrainerInfoService {
 
     Trainer trainer = trainerRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
     return TrainerResponse.builder()
         .name(trainer.getName())
         .email(trainer.getEmail())

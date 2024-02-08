@@ -18,6 +18,6 @@ public class MissionForm {
   1개월 단위로 선택 가능
   ex) period = 1개월 OR period = 5개월
    */
-  private String months;
+  private int period;
 
 }

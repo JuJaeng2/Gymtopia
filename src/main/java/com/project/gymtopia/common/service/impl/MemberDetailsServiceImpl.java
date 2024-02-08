@@ -1,4 +1,4 @@
-package com.project.gymtopia.common.service;
+package com.project.gymtopia.common.service.impl;
 
 import static com.project.gymtopia.exception.ErrorCode.MEMBER_NOT_FOUND;
 
@@ -8,7 +8,6 @@ import com.project.gymtopia.member.data.model.MemberSecurityDto;
 import com.project.gymtopia.member.repository.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Qualifier("memberDetailsService")
 public class MemberDetailsServiceImpl implements UserDetailsService {
 
   private final MemberRepository memberRepository;

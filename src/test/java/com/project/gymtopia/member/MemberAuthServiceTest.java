@@ -44,9 +44,9 @@ public class MemberAuthServiceTest {
   @InjectMocks
   private MemberAuthServiceImpl memberAuthService;
 
-  Member member;
-  UserSignInForm signInForm;
-  UserSignUpForm userSignUpForm;
+  private Member member;
+  private UserSignInForm signInForm;
+  private UserSignUpForm userSignUpForm;
   @BeforeEach
   public void setUp() {
 

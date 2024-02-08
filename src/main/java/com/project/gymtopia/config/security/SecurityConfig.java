@@ -26,7 +26,7 @@ public class SecurityConfig {
         .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
             SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authorizeRequest -> {
-          authorizeRequest.requestMatchers("/signUp/**", "/signIn/**").permitAll();
+          authorizeRequest.requestMatchers("/signUp/**", "/signIn/**", "/search/**", "sse/subscribe").permitAll();
           authorizeRequest.requestMatchers("/trainer/**").hasAuthority(String.valueOf(Roles.TRAINER));
           authorizeRequest.requestMatchers("/member/**").hasAuthority(String.valueOf(Roles.MEMBER));
         })

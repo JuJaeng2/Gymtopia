@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/member")
 public class MemberJournalController {
-
-  @Value("${cloud.aws.s3.bucket}")
 
   private final MemberJournalService memberJournalService;
 
@@ -168,7 +165,7 @@ public class MemberJournalController {
 
   private boolean isMultipartFileValid(
       List<MultipartFile> imageFileList, List<MultipartFile> videoFile) {
-    if (imageFileList.size() > 2 || videoFile.size() > 1) {
+    if (!imageFileList.isEmpty() && (imageFileList.size() > 2 || videoFile.size() > 1)) {
       return false;
     }
     return true;

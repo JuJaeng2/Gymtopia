@@ -9,7 +9,6 @@ public class GymtopiaApplication {
   public static void main(String[] args) {
     SpringApplication.run(GymtopiaApplication.class, args);
 
-
   }
 
 }

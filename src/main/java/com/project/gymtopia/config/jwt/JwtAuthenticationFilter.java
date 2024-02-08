@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
@@ -28,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
-    String token = getTokenFromRequest(request);
+    String token = jwtTokenProvider.getTokenFromRequest(request);
 
     if (token != null && jwtTokenProvider.validateToken(token)){
       Roles role = jwtTokenProvider.getRole(token);
@@ -38,15 +37,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     filterChain.doFilter(request, response);
 
-  }
-
-  private String getTokenFromRequest(HttpServletRequest request){
-    String token = request.getHeader(TOKEN_HEADER);
-
-    if (!ObjectUtils.isEmpty(token) && token.startsWith(TOKEN_PREFIX)){
-      return token.substring(TOKEN_PREFIX.length());
-    }
-
-    return null;
   }
 }
