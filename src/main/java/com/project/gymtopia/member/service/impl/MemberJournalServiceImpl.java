@@ -133,12 +133,11 @@ public class MemberJournalServiceImpl implements MemberJournalService {
       checkUploadState(videoUploadState, mediaFileUrlList);
     }
 
-    if (!imageMultipartFileList.isEmpty()) {
-      for (MultipartFile imageMultipartFile : imageMultipartFileList) {
-        MediaUploadState imageUploadState = uploadFileToS3(imageMultipartFile);
-        checkUploadState(imageUploadState, mediaFileUrlList);
-      }
+    for (MultipartFile imageMultipartFile : imageMultipartFileList) {
+      MediaUploadState imageUploadState = uploadFileToS3(imageMultipartFile);
+      checkUploadState(imageUploadState, mediaFileUrlList);
     }
+
 
     // 파일 저장
     for (String mediaFileUrl : mediaFileUrlList) {
@@ -330,11 +329,15 @@ public class MemberJournalServiceImpl implements MemberJournalService {
    */
   private Mission checkMission(long missionId) {
 
-    return missionRepository.findByIdAndState(missionId, MissionState.PROGRESSING)
+    Mission mission = missionRepository.findByIdAndState(missionId, MissionState.PROGRESSING)
         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
 
-  }
+    journalRepository.findByMission(mission).ifPresent(a -> {
+      throw new CustomException(ErrorCode.MISSION_JOURNAL_ALREADY_EXIST);
+        });
 
+    return mission;
+  }
 
   /**
    * 일지에 들어갈 이미지를 AWS S3에 저장

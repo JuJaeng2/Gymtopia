@@ -36,6 +36,7 @@ public enum ErrorCode {
   //Mission
   MISSION_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 수행중인 미션이 존재합니다."),
   MISSION_NOT_FOUND(HttpStatus.BAD_REQUEST, "받은 미션이 없거나, 수행중인 미션이 없습니다."),
+  MISSION_JOURNAL_ALREADY_EXIST(HttpStatus.CONFLICT, "이미 해당 미션에 대한 일지가 존재합니다."),
 
   //Review
   REVIEW_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 작성한 리뷰가 있습니다."),
@@ -50,7 +51,8 @@ public enum ErrorCode {
   PROCESSED_REQUEST(HttpStatus.BAD_REQUEST, "이미 처리된 운동 관리 신청입니다."),
 
   //SSE
-  SSE_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SSE 전송에 문제가 발생했습니다.");
+  SSE_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SSE 전송에 문제가 발생했습니다."),
+  NOT_LOGIN(HttpStatus.BAD_REQUEST, "수신자가 연결되어 있지 않습니다.");
 
 
   private final HttpStatus httpStatus;

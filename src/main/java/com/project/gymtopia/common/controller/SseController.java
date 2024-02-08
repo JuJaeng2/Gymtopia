@@ -3,6 +3,7 @@ package com.project.gymtopia.common.controller;
 import com.project.gymtopia.common.service.AlarmService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/sse")
 public class SseController {
 
@@ -25,7 +27,9 @@ public class SseController {
   ) {
     String email = authentication.getName();
 
-    return alarmService.subscribe(email, lastEventId, request);
+    log.info("Last-Event-Id : {}", lastEventId);
+
+    return alarmService.connect(email, lastEventId, request);
   }
 
 
