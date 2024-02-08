@@ -28,14 +28,6 @@ public class MemberMissionServiceImpl implements MemberMissionService {
     List<Mission> missionList = missionRepository.findAllByMember(member)
         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
 
-    return missionList.stream().map(mission -> MissionResponse.builder()
-        .title(mission.getTitle())
-        .contents(mission.getContents())
-        .trainerName(mission.getTrainer().getName())
-        .missionState(mission.getState())
-        .startDateTime(mission.getCreateDateTime())
-        .expirationDateTime(mission.getExpirationDateTime())
-        .build())
-        .toList();
+    return missionList.stream().map(mission -> MissionResponse.from(mission)).toList();
   }
 }

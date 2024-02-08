@@ -289,15 +289,13 @@ public class MemberJournalServiceImpl implements MemberJournalService {
 
     List<Media> mediaList = mediaRepository.findAllByJournal(journal);
 
-    if (!mediaList.isEmpty()) {
-      int idx = 0;
-      for (Media media : mediaList) {
-        idx = media.getUrl().lastIndexOf("/");
-        deleteImage(media.getUrl().substring(idx + 1));
-      }
-
-      mediaRepository.deleteAllInQuery(journal);
+    int idx = 0;
+    for (Media media : mediaList) {
+      idx = media.getUrl().lastIndexOf("/");
+      deleteImage(media.getUrl().substring(idx + 1));
     }
+
+    mediaRepository.deleteAllInQuery(journal);
 
     journalRepository.delete(journal);
 
