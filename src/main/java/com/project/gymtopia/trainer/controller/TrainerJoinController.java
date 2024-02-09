@@ -42,7 +42,7 @@ public class TrainerJoinController {
     return ResponseEntity.ok(tokenResponse);
   }
 
-  @PostMapping("/withdraw/member")
+  @PostMapping("/withdraw/trainer")
   public ResponseEntity<?> memberWithdraw(
       Authentication authentication,
       @RequestBody WithdrawForm withdrawForm){

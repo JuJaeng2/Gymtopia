@@ -29,6 +29,7 @@ public enum ErrorCode {
   NOT_SAME_MEMBER_AND_WRITER(HttpStatus.BAD_REQUEST, "일지 작성자와 일지를 조회하려는 회원이 동일하지 않습니다."),
   NOT_WRITER_OF_JOURNAL(HttpStatus.BAD_REQUEST, "회원의 일지가 아닙니다."),
   WRONG_JOURNAL_TYPE(HttpStatus.BAD_REQUEST, "회원의 미션 일지만 확인할 수 있습니다."),
+  EXCEED_LIMIT(HttpStatus.BAD_REQUEST, "이미지 파일은 최대 2개, 영상 파일은 최대 1개까지만 업로드 가능합니다."),
 
   //Feedback
   FEEDBACK_NOT_FOUND(HttpStatus.BAD_REQUEST, "피드백이 존재하지 않습니다."),
