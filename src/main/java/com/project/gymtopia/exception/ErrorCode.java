@@ -16,6 +16,10 @@ public enum ErrorCode {
   //Trainer
   TRAINER_NOT_FOUND(HttpStatus.BAD_REQUEST, "트레이너 정보를 찾을 수 업습니다..!"),
 
+  // Withdraw
+  NOT_SAME_MEMBER(HttpStatus.CONFLICT, "이메일이 일치하지 않습니다."),
+
+
   //AWS S3 ImageException
   IMAGE_UPLOAD_FAIL(HttpStatus.BAD_REQUEST, "이미지 업로드에 실패했습니다."),
   IMAGE_DELETE_FAIL(HttpStatus.BAD_REQUEST, "이미지 삭제에 실패했습니다."),

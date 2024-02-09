@@ -13,8 +13,10 @@ import com.project.gymtopia.exception.ErrorCode;
 import com.project.gymtopia.member.data.entity.Member;
 import com.project.gymtopia.member.data.model.MemberDto;
 import com.project.gymtopia.member.data.model.MemberResponse;
+import com.project.gymtopia.member.data.model.WithdrawForm;
 import com.project.gymtopia.member.repository.MemberRepository;
 import com.project.gymtopia.member.service.MemberAuthService;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -86,6 +88,19 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         .address(newMember.getAddress())
         .number(newMember.getNumber())
         .build();
+  }
+
+  @Override
+  public void withdraw(String email, WithdrawForm withdrawForm) {
+    Member member = memberRepository.findByEmail(email)
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+    if (!member.getEmail().equals(withdrawForm.getEmail())) {
+      throw new CustomException(ErrorCode.NOT_SAME_MEMBER);
+    }
+
+    member.setRemovedDate(LocalDate.now());
+
   }
 
   private boolean isEmailExist(String email) {
