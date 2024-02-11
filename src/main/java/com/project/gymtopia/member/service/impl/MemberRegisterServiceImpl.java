@@ -12,9 +12,11 @@ import com.project.gymtopia.trainer.data.entity.Trainer;
 import com.project.gymtopia.trainer.repository.TrainerRepository;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MemberRegisterServiceImpl implements MemberRegisterService {
 
@@ -42,6 +44,13 @@ public class MemberRegisterServiceImpl implements MemberRegisterService {
     registerRepository.save(newRegister);
 
     //TODO: 등록 요청이 왔다는 알림을 해당 트레이너에게 전송
+  }
+
+  @Override
+  public void deleteAllRegisterInBatch(LocalDate oneWeekAgo){
+
+    registerRepository.deleteAllByAcceptYnIsFalseAndRegisterDateAfter(oneWeekAgo);
+    log.info("1주일이 지난 운동관리 신청 데이터를 모두 삭제하였습니다.");
   }
 
 }

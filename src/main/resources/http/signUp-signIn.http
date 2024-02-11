@@ -4,8 +4,8 @@ POST http://localhost:8080/signUp/member
 Content-Type: application/json
 
 {
-  "name": "유저1",
-  "email": "test1@naver.com",
+  "name": "유저10",
+  "email": "test10@naver.com",
   "password": "1111",
   "address": "서울시 어쩌구 저쩌구",
   "birth": "1998-03-26",

@@ -1,8 +1,6 @@
 package com.project.gymtopia.common.repository;
 
 import com.project.gymtopia.common.data.model.AlarmResponse;
-import com.project.gymtopia.exception.CustomException;
-import com.project.gymtopia.exception.ErrorCode;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -40,7 +38,8 @@ public class SseRepository {
 
   public SseEmitter findEmitterById(String emitterId){
     if (sseEmitterMap.get(emitterId) == null){
-      throw new CustomException(ErrorCode.NOT_LOGIN);
+//      throw new CustomException(ErrorCode.NOT_LOGIN);
+      log.info("EmitterId {} 연결 X : 알림 전송 불가능", emitterId);
     }
     return sseEmitterMap.get(emitterId);
   }

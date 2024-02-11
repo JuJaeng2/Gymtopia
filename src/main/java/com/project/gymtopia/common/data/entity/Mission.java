@@ -11,13 +11,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Getter
@@ -46,9 +45,8 @@ public class Mission {
   @Enumerated(value = EnumType.STRING)
   private MissionState state;
 
-  @CreatedDate
-  private LocalDateTime createDateTime;
+  private LocalDate createDate;
 
-  private LocalDateTime expirationDateTime;
+  private LocalDate expirationDate;
 
 }

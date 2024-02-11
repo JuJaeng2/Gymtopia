@@ -14,6 +14,7 @@ import com.project.gymtopia.common.data.MissionState;
 import com.project.gymtopia.common.data.entity.Mission;
 import com.project.gymtopia.common.data.model.ResponseMessage;
 import com.project.gymtopia.common.repository.MissionRepository;
+import com.project.gymtopia.common.roles.Roles;
 import com.project.gymtopia.common.service.AlarmService;
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;
@@ -146,7 +147,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
 
     //TODO: 일지 저장이 완료된 후 트레이너에게 알림 보내기
     String message = member.getName() + "님이 일지를 작성했습니다. 확인 후 피드백을 남겨주세요.";
-    alarmService.send(member, mission.getTrainer(), message);
+    alarmService.send(member, mission.getTrainer(), message, Roles.TRAINER);
 
     return true;
   }

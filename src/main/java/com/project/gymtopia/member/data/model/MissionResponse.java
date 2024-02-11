@@ -2,7 +2,7 @@ package com.project.gymtopia.member.data.model;
 
 import com.project.gymtopia.common.data.MissionState;
 import com.project.gymtopia.common.data.entity.Mission;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,8 +18,8 @@ public class MissionResponse {
   private String contents;
   private String trainerName;
   private MissionState missionState;
-  private LocalDateTime startDateTime;
-  private LocalDateTime expirationDateTime;
+  private LocalDate startDate;
+  private LocalDate expirationDate;
 
   public static MissionResponse from(Mission mission){
     return MissionResponse.builder()
@@ -27,8 +27,8 @@ public class MissionResponse {
         .contents(mission.getContents())
         .trainerName(mission.getTrainer().getName())
         .missionState(mission.getState())
-        .startDateTime(mission.getCreateDateTime())
-        .expirationDateTime(mission.getExpirationDateTime())
+        .startDate(mission.getCreateDate())
+        .expirationDate(mission.getExpirationDate())
         .build();
   }
 

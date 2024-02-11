@@ -40,5 +40,6 @@ public class Alarm {
 
   @Enumerated(value = EnumType.STRING)
   private AlarmType alarmType;
+
   private LocalDateTime createDateTime;
 }

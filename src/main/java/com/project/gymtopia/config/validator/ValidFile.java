@@ -1,6 +1,5 @@
 package com.project.gymtopia.config.validator;
 
-import com.project.gymtopia.config.MultipartFileValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;

@@ -1,7 +1,6 @@
-package com.project.gymtopia.config;
+package com.project.gymtopia.config.validator;
 
 
-import com.project.gymtopia.config.validator.ValidFile;
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;
 import jakarta.validation.ConstraintValidator;

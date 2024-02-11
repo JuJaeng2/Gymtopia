@@ -71,7 +71,8 @@ public class MemberJournalController {
   ) throws IOException {
 
     String email = authentication.getName();
-    if (memberJournalService.uploadJournal(journalForm, email, missionId, imageFileList, videoFile.get(0))) {
+    if (memberJournalService.uploadJournal(journalForm, email, missionId, imageFileList,
+        videoFile.get(0))) {
       return ResponseEntity.ok(ResponseMessage.builder()
           .message("일지 저장 성공!!")
           .build());

@@ -55,6 +55,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         UserDto.builder()
             .name(memberDto.getName())
             .email(memberDto.getEmail())
+            .id(memberDto.getId())
             .build(),
         memberDto.getRole());
   }
