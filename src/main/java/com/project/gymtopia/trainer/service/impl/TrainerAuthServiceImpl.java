@@ -1,7 +1,5 @@
 package com.project.gymtopia.trainer.service.impl;
 
-import static com.project.gymtopia.exception.ErrorCode.TRAINER_NOT_FOUND;
-
 import com.project.gymtopia.common.data.model.TokenResponse;
 import com.project.gymtopia.common.data.model.UserDto;
 import com.project.gymtopia.common.data.model.UserSignUpForm;
@@ -9,13 +7,11 @@ import com.project.gymtopia.common.roles.Roles;
 import com.project.gymtopia.config.jwt.JwtToken;
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;
-import com.project.gymtopia.member.data.model.WithdrawForm;
 import com.project.gymtopia.trainer.data.entity.Trainer;
 import com.project.gymtopia.trainer.data.model.TrainerDto;
 import com.project.gymtopia.trainer.data.model.TrainerResponse;
 import com.project.gymtopia.trainer.repository.TrainerRepository;
 import com.project.gymtopia.trainer.service.TrainerAuthService;
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,7 +28,7 @@ public class TrainerAuthServiceImpl implements TrainerAuthService {
   public TrainerDto authenticate(String email, String password) {
 
     Trainer trainer = trainerRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
     if (!passwordEncoder.matches(password, trainer.getPassword())) {
       throw new CustomException(ErrorCode.WRONG_PASSWORD);
@@ -53,7 +49,6 @@ public class TrainerAuthServiceImpl implements TrainerAuthService {
         UserDto.builder()
             .id(trainerDto.getId())
             .name(trainerDto.getName())
-            .email(trainerDto.getEmail())
             .build(),
         trainerDto.getRole());
   }
@@ -83,18 +78,6 @@ public class TrainerAuthServiceImpl implements TrainerAuthService {
         .email(newTrainer.getEmail())
         .number(newTrainer.getNumber())
         .build();
-  }
-
-  @Override
-  public void withdraw(String email, WithdrawForm withdrawForm) {
-    Trainer trainer = trainerRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(TRAINER_NOT_FOUND));
-
-    if (!trainer.getEmail().equals(withdrawForm.getEmail())) {
-      throw new CustomException(ErrorCode.NOT_SAME_MEMBER);
-    }
-
-    trainer.setRemovedDate(LocalDate.now());
   }
 
   private boolean isEmailExist(String email){

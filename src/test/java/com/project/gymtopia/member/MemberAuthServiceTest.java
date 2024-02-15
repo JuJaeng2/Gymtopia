@@ -44,9 +44,9 @@ public class MemberAuthServiceTest {
   @InjectMocks
   private MemberAuthServiceImpl memberAuthService;
 
-  private Member member;
-  private UserSignInForm signInForm;
-  private UserSignUpForm userSignUpForm;
+  Member member;
+  UserSignInForm signInForm;
+  UserSignUpForm userSignUpForm;
   @BeforeEach
   public void setUp() {
 
@@ -113,12 +113,12 @@ public class MemberAuthServiceTest {
   }
 
   @Test
-  @DisplayName("authenticateException-USER_NOT_FOUND")
+  @DisplayName("authenticateExcetpion-USER_NOT_FOUND")
   void authenticateExceptionTest1() {
     //given
 
     Mockito.when(memberRepository.findByEmail(Mockito.anyString())).thenThrow(new CustomException(
-        ErrorCode.MEMBER_NOT_FOUND));
+        ErrorCode.USER_NOT_FOUND));
     //when
 
     Throwable exception = Assertions.assertThrows(CustomException.class, () -> memberAuthService.authenticate(
@@ -126,7 +126,7 @@ public class MemberAuthServiceTest {
 
     //then
 
-    Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
+    Assertions.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), exception.getMessage());
 
   }
 
