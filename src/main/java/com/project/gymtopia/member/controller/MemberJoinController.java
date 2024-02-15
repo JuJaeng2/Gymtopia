@@ -5,19 +5,15 @@ import com.project.gymtopia.common.data.model.UserSignInForm;
 import com.project.gymtopia.common.data.model.UserSignUpForm;
 import com.project.gymtopia.member.data.model.MemberDto;
 import com.project.gymtopia.member.data.model.MemberResponse;
-import com.project.gymtopia.member.data.model.WithdrawForm;
 import com.project.gymtopia.member.service.MemberAuthService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 public class MemberJoinController {
 
   private final MemberAuthService memberAuthService;
@@ -45,15 +41,6 @@ public class MemberJoinController {
     TokenResponse tokenResponse = memberAuthService.createToken(memberDto);
 
     return ResponseEntity.ok(tokenResponse);
-  }
-
-  @PostMapping("/withdraw/member")
-  public ResponseEntity<?> memberWithdraw(
-      Authentication authentication,
-      @RequestBody WithdrawForm withdrawForm){
-
-    memberAuthService.withdraw(authentication.getName(), withdrawForm);
-    return ResponseEntity.ok("탈퇴처리가 완료되었습니다.");
   }
 
 

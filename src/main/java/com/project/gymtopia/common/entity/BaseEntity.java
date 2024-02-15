@@ -1,4 +1,4 @@
-package com.project.gymtopia.common.data.entity;
+package com.project.gymtopia.common.entity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
