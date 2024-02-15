@@ -14,13 +14,13 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLtirjroIjsnbTrhIgzIiwicm9sZ
 
 ### 미션 부여하기
 POST http://localhost:8080/trainer/management/mission/member/2
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLtirjroIjsnbTrhIgzIiwicm9sZSI6IlRSQUlORVIiLCJlbWFpbCI6IlRyYWluZXIzQG5hdmVyLmNvbSIsImlkIjo1LCJpYXQiOjE3MDcyMDQzNTQsImV4cCI6MTcwNzIwNzk1NH0.MGXM1m3UQFpHmjSK3bu-JRfwDEscbfivDYn_jpcs8zoCuifx2YJcFWawdfYvDH992OV3tqLUyMNfQFiFjtt8dQ
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLtirjroIjsnbTrhIgzIiwicm9sZSI6IlRSQUlORVIiLCJlbWFpbCI6IlRyYWluZXIzQG5hdmVyLmNvbSIsImlkIjo1LCJpYXQiOjE3MDc2NTUwMTMsImV4cCI6MTcwNzY1ODYxM30.hBV2vUJkOOCuN8FsyIqAC5KpBeOtTNVEa00DncTzMxlrmZiLANcp9_7ZXxNHVVVncOGwuanARwfWFmd_vS1LJQ
 Content-Type: application/json
 
 {
-  "title": "Test mission5",
-  "contents": "Test Contents5",
-  "period": 5
+  "title": "Test mission8",
+  "contents": "Test Contents",
+  "period": 6
 }
 
 

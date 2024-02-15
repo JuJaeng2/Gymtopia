@@ -28,7 +28,6 @@ import com.project.gymtopia.trainer.repository.ManagementRepository;
 import com.project.gymtopia.trainer.repository.TrainerRepository;
 import com.project.gymtopia.trainer.service.impl.TrainerManagementServiceImpl;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -107,7 +106,7 @@ class TrainerManagementServiceTest {
         .title("Test mission")
         .contents("Test mission detail")
         .state(MissionState.PROGRESSING)
-        .createDateTime(LocalDateTime.now())
+        .createDate(LocalDate.now())
         .build();
 
     journal = Journal.builder()

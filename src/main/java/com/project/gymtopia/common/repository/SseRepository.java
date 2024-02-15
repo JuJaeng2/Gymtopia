@@ -36,25 +36,33 @@ public class SseRepository {
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
+  public SseEmitter findEmitterById(String emitterId){
+    if (sseEmitterMap.get(emitterId) == null){
+//      throw new CustomException(ErrorCode.NOT_LOGIN);
+      log.info("EmitterId {} 연결 X : 알림 전송 불가능", emitterId);
+    }
+    return sseEmitterMap.get(emitterId);
+  }
+
   public Map<String, Object> findAllEventCacheStartWithId(String id) {
-    return cacheMap.entrySet().stream()
+    log.info("findAllEventCacheStartWithId >>> {}", id);
+    Map<String, Object> caches = cacheMap.entrySet().stream()
         .filter(entry -> entry.getKey().startsWith(id))
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+    log.info("Cache Map => {}", caches.size());
+
+    return caches;
   }
 
   public void deleteById(String id) {
     sseEmitterMap.remove(id);
+    log.info("SseEmitter Map : {}", sseEmitterMap);
   }
 
   // 해당 회원과 관련된 모든 emitter를 지움
-  public void deleteAllEmitterStartWithId(String id) {
-    sseEmitterMap.forEach(
-        (key, emitter) -> {
-          if (key.startsWith(id)) {
-            sseEmitterMap.remove(key);
-          }
-        }
-    );
+  public void deleteEmitterStartWithId(String id) {
+    sseEmitterMap.remove(id);
   }
 
   public void deleteAllEventCacheStartWithId(String id) { // 해당 회원과 관련된 모든 이벤트를 지움
