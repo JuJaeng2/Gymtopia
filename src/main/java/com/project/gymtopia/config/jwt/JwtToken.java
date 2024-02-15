@@ -105,8 +105,8 @@ public class JwtToken {
     return Roles.valueOf(claims.get("role", String.class));
   }
 
-  public long getId(String token) {
+  public String getId(String token) {
     Claims claims = parseClaims(token);
-    return claims.get("id", Long.class);
+    return String.valueOf(claims.get("id", Long.class));
   }
 }

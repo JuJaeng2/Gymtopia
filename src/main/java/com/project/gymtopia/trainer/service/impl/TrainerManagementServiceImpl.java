@@ -33,6 +33,7 @@ import com.project.gymtopia.trainer.repository.TrainerRepository;
 import com.project.gymtopia.trainer.service.TrainerManagementService;
 import com.project.gymtopia.util.MediaUtil;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -216,7 +217,7 @@ public class TrainerManagementServiceImpl implements TrainerManagementService {
     Member member = memberRepository.findById(memberId)
         .orElseThrow( () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-    LocalDate now = LocalDate.now();
+    LocalDateTime now = LocalDateTime.now();
 
     Mission newMission = Mission.builder()
         .member(member)
@@ -224,8 +225,8 @@ public class TrainerManagementServiceImpl implements TrainerManagementService {
         .title(missionForm.getTitle())
         .contents(missionForm.getContents())
         .state(MissionState.PROGRESSING)
-        .createDate(now)
-        .expirationDate(now.plusDays(missionForm.getPeriod()))
+        .createDateTime(now)
+        .expirationDateTime(now.plusDays(missionForm.getPeriod()))
         .build();
 
     missionRepository.save(newMission);

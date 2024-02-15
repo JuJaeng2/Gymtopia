@@ -12,14 +12,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MissionRepository extends JpaRepository<Mission, Long> {
 
-  List<Mission> findByMemberAndState(Member member, MissionState state);
+  Optional<Mission> findByMemberAndState(Member member, MissionState state);
 
   Optional<Mission> findByIdAndState(long id, MissionState state);
 
   Optional<Mission> findByTrainerAndMember(Trainer trainer, Member member);
 
   Optional<List<Mission>> findAllByMember(Member member);
-
 
 
 }

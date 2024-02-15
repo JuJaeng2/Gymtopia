@@ -11,6 +11,7 @@ import com.project.gymtopia.member.service.MemberReviewService;
 import com.project.gymtopia.trainer.data.entity.Trainer;
 import com.project.gymtopia.trainer.repository.ManagementRepository;
 import com.project.gymtopia.trainer.repository.TrainerRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +34,10 @@ public class MemberReviewServiceImpl implements MemberReviewService {
 
     managementRepository.findByTrainerAndMember(trainer, member);
 
-    reviewRepository.findByMemberAndTrainer(member, trainer).ifPresent(a -> {
+    Optional<Review> optionalReview = reviewRepository.findByMemberAndTrainer(member, trainer);
+    if (optionalReview.isPresent()){
       throw new CustomException(ErrorCode.REVIEW_ALREADY_EXIST);
-    });
+    }
 
     Review newReview = Review.builder()
         .contents(reviewForm.getContents())

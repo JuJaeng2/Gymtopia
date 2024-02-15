@@ -14,7 +14,6 @@ import com.project.gymtopia.common.data.MissionState;
 import com.project.gymtopia.common.data.entity.Mission;
 import com.project.gymtopia.common.data.model.ResponseMessage;
 import com.project.gymtopia.common.repository.MissionRepository;
-import com.project.gymtopia.common.roles.Roles;
 import com.project.gymtopia.common.service.AlarmService;
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;
@@ -134,11 +133,12 @@ public class MemberJournalServiceImpl implements MemberJournalService {
       checkUploadState(videoUploadState, mediaFileUrlList);
     }
 
-    for (MultipartFile imageMultipartFile : imageMultipartFileList) {
-      MediaUploadState imageUploadState = uploadFileToS3(imageMultipartFile);
-      checkUploadState(imageUploadState, mediaFileUrlList);
+    if (!imageMultipartFileList.isEmpty()) {
+      for (MultipartFile imageMultipartFile : imageMultipartFileList) {
+        MediaUploadState imageUploadState = uploadFileToS3(imageMultipartFile);
+        checkUploadState(imageUploadState, mediaFileUrlList);
+      }
     }
-
 
     // 파일 저장
     for (String mediaFileUrl : mediaFileUrlList) {
@@ -147,7 +147,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
 
     //TODO: 일지 저장이 완료된 후 트레이너에게 알림 보내기
     String message = member.getName() + "님이 일지를 작성했습니다. 확인 후 피드백을 남겨주세요.";
-    alarmService.send(member, mission.getTrainer(), message, Roles.TRAINER);
+    alarmService.send(member, mission.getTrainer(), message);
 
     return true;
   }
@@ -289,13 +289,15 @@ public class MemberJournalServiceImpl implements MemberJournalService {
 
     List<Media> mediaList = mediaRepository.findAllByJournal(journal);
 
-    int idx = 0;
-    for (Media media : mediaList) {
-      idx = media.getUrl().lastIndexOf("/");
-      deleteImage(media.getUrl().substring(idx + 1));
-    }
+    if (!mediaList.isEmpty()) {
+      int idx = 0;
+      for (Media media : mediaList) {
+        idx = media.getUrl().lastIndexOf("/");
+        deleteImage(media.getUrl().substring(idx + 1));
+      }
 
-    mediaRepository.deleteAllInQuery(journal);
+      mediaRepository.deleteAllInQuery(journal);
+    }
 
     journalRepository.delete(journal);
 
@@ -330,15 +332,11 @@ public class MemberJournalServiceImpl implements MemberJournalService {
    */
   private Mission checkMission(long missionId) {
 
-    Mission mission = missionRepository.findByIdAndState(missionId, MissionState.PROGRESSING)
+    return missionRepository.findByIdAndState(missionId, MissionState.PROGRESSING)
         .orElseThrow(() -> new CustomException(ErrorCode.MISSION_NOT_FOUND));
 
-    journalRepository.findByMission(mission).ifPresent(a -> {
-      throw new CustomException(ErrorCode.MISSION_JOURNAL_ALREADY_EXIST);
-        });
-
-    return mission;
   }
+
 
   /**
    * 일지에 들어갈 이미지를 AWS S3에 저장
