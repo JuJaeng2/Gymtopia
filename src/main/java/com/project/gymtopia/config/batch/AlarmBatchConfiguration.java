@@ -1,7 +1,6 @@
 package com.project.gymtopia.config.batch;
 
 import com.project.gymtopia.common.data.entity.Mission;
-import com.project.gymtopia.common.roles.Roles;
 import com.project.gymtopia.common.service.AlarmService;
 import com.project.gymtopia.member.data.entity.Member;
 import com.project.gymtopia.trainer.data.entity.Trainer;
@@ -76,7 +75,7 @@ public class AlarmBatchConfiguration {
       Member member = item.getMember();
       Trainer trainer = item.getTrainer();
       String message = "미션 인증 마감 하루 전 입니다.";
-      alarmService.send(member, trainer, message, Roles.MEMBER);
+      alarmService.sendMissionAlarm(member, trainer, message);
 
       return item;
     };

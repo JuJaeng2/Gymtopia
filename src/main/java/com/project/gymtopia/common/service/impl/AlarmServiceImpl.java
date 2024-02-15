@@ -5,7 +5,6 @@ import com.project.gymtopia.common.data.entity.Alarm;
 import com.project.gymtopia.common.data.model.AlarmResponse;
 import com.project.gymtopia.common.repository.AlarmRepository;
 import com.project.gymtopia.common.repository.SseRepository;
-import com.project.gymtopia.common.roles.Roles;
 import com.project.gymtopia.common.service.AlarmService;
 import com.project.gymtopia.config.jwt.JwtToken;
 import com.project.gymtopia.exception.CustomException;
@@ -84,27 +83,21 @@ public class AlarmServiceImpl implements AlarmService {
   }
 
   /**
-   * 알림 보내기
+   * 회원이 받은 미션에대한 새로운 일지를 썼다는 알림을 관리해주는 트레이너에게 보내기
    */
   @Override
-  public void send(Member member, Trainer trainer, String contents, Roles receiver) {
+  public void sendJournalAlarm(Member member, Trainer trainer, String contents) {
     log.info("알람을 보냅니다. 알람 내용 : {}", contents);
-
-    Map<String, Object> map =
-        Map.of(
-            "alarmType", receiver == Roles.TRAINER ? AlarmType.JOURNAL : AlarmType.MISSION,
-            "emitterId", receiver == Roles.TRAINER ?
-                makeId(trainer.getId(), trainer.getEmail()) : makeId(member.getId(), member.getEmail()));
 
     Alarm alarm = Alarm.builder()
         .contents(contents)
         .member(member)
         .trainer(trainer)
-        .alarmType((AlarmType) map.get("alarmType"))
+        .alarmType(AlarmType.JOURNAL)
         .createDateTime(LocalDateTime.now())
         .build();
 
-    String emitterId = String.valueOf(map.get("emitterId"));
+    String emitterId = makeId(trainer.getId(), trainer.getEmail());
     AlarmResponse alarmResponse = AlarmResponse.from(alarm);
     sseRepository.saveCache(emitterId + System.currentTimeMillis(), alarmResponse);
 
@@ -118,6 +111,34 @@ public class AlarmServiceImpl implements AlarmService {
     alarmRepository.save(alarm);
 
   }
+
+  @Override
+  public void sendMissionAlarm(Member member, Trainer trainer, String contents) {
+    log.info("알람을 보냅니다. 알람 내용 : {}", contents);
+
+    Alarm alarm = Alarm.builder()
+        .contents(contents)
+        .member(member)
+        .trainer(trainer)
+        .alarmType(AlarmType.MISSION)
+        .createDateTime(LocalDateTime.now())
+        .build();
+
+    String emitterId =makeId(member.getId(), member.getEmail());
+    AlarmResponse alarmResponse = AlarmResponse.from(alarm);
+    sseRepository.saveCache(emitterId + System.currentTimeMillis(), alarmResponse);
+
+    SseEmitter sseEmitter = sseRepository.findEmitterById(emitterId);
+    if (sseEmitter == null){
+      return;
+    }
+
+    sendToClient(sseEmitter, emitterId, alarmResponse);
+
+    alarmRepository.save(alarm);
+
+  }
+
 
   private void sendToClient(SseEmitter sseEmitter, String emitterId, Object data) {
     try {

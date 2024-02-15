@@ -145,9 +145,8 @@ public class MemberJournalServiceImpl implements MemberJournalService {
       saveImageUrl(journal, mediaFileUrl);
     }
 
-    //TODO: 일지 저장이 완료된 후 트레이너에게 알림 보내기
     String message = member.getName() + "님이 일지를 작성했습니다. 확인 후 피드백을 남겨주세요.";
-    alarmService.send(member, mission.getTrainer(), message, Roles.TRAINER);
+    alarmService.sendJournalAlarm(member, mission.getTrainer(), message);
 
     return true;
   }
