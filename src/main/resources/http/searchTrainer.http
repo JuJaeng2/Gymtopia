@@ -1,0 +1,5 @@
+### 모든 트레이너 목록 반환
+GET http://localhost:8080/search/trainer?page=3&size=3
+
+### 특정 트레이너 정보 반환
+GET http://localhost:8080/search/trainer/5

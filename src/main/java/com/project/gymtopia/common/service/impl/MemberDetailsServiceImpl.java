@@ -1,6 +1,6 @@
-package com.project.gymtopia.common.service;
+package com.project.gymtopia.common.service.impl;
 
-import static com.project.gymtopia.exception.ErrorCode.USER_NOT_FOUND;
+import static com.project.gymtopia.exception.ErrorCode.MEMBER_NOT_FOUND;
 
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.member.data.entity.Member;
@@ -15,14 +15,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class MemberDetailsServiceImpl implements UserDetailsService {
 
   private final MemberRepository memberRepository;
 
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Member member = memberRepository.findByName(username)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    Member member = memberRepository.findByEmail(email)
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
     return MemberSecurityDto.builder()
         .name(member.getName())

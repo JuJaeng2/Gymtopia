@@ -12,4 +12,8 @@ public class ExceptionController {
         return new ResponseEntity<>(exception.getMessage(),exception.getErrorCode().getHttpStatus());
     }
 
+    @ExceptionHandler(ImageUploadException.class)
+    public ResponseEntity<?> imageUploadExceptionHandler(ImageUploadException exception){
+        return new ResponseEntity<>(exception.getMessage(),exception.getErrorCode().getHttpStatus());
+    }
 }

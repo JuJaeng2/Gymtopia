@@ -42,9 +42,9 @@ public class TrainerAuthServiceTest {
   @InjectMocks
   private TrainerAuthServiceImpl trainerAuthService;
 
-  Trainer trainer;
-  UserSignInForm signInForm;
-  UserSignUpForm userSignUpForm;
+  private Trainer trainer;
+  private UserSignInForm signInForm;
+  private UserSignUpForm userSignUpForm;
 
   @BeforeEach
   public void setUp() {
@@ -104,7 +104,7 @@ public class TrainerAuthServiceTest {
     //given
 
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString())).thenThrow(new CustomException(
-        ErrorCode.USER_NOT_FOUND));
+        ErrorCode.MEMBER_NOT_FOUND));
     //when
 
     Throwable exception = Assertions.assertThrows(CustomException.class, () -> trainerAuthService.authenticate(
@@ -112,7 +112,7 @@ public class TrainerAuthServiceTest {
 
     //then
 
-    Assertions.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), exception.getMessage());
+    Assertions.assertEquals(ErrorCode.MEMBER_NOT_FOUND.getMessage(), exception.getMessage());
 
   }
 

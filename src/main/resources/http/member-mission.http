@@ -1,0 +1,3 @@
+### 회원이 받은 미션 확인하기
+GET http://localhost:8080/member/mission
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLsnKDsoIAxIiwicm9sZSI6Ik1FTUJFUiIsImVtYWlsIjoidGVzdDFAbmF2ZXIuY29tIiwiaWF0IjoxNzA3MTAyMzgxLCJleHAiOjE3MDcxMDU5ODF9.QYnnR2cYViTfQ-i03i9n0NP_rPaNOI0FXFxQdrguplb22NlGOE_6y50RLDOZcIRpXWLIDsBcvefOF5-BXOn34Q

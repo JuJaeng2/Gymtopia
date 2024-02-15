@@ -1,0 +1,9 @@
+### 원하는 트레이너에게 운동 신청
+POST http://localhost:8080/member/register/trainer/5
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLsnKDsoIAxIiwicm9sZSI6Ik1FTUJFUiIsImVtYWlsIjoidGVzdDFAbmF2ZXIuY29tIiwiaWF0IjoxNzA3NjM2NjU1LCJleHAiOjE3MDc2NDAyNTV9.USzAQcEw8k3nnWZEc6BOaQA9CjBJLEbm_ZEZlusL2nAOUJqODT3OSYxYrGDwQspmsqcGboTw1WwCMCGtCdiO7w
+Content-Type: application/json
+
+{
+  "startDate": "2024-01-10",
+  "endDate": "2024-03-20"
+}

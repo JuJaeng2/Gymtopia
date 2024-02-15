@@ -4,9 +4,9 @@ POST http://localhost:8080/signUp/member
 Content-Type: application/json
 
 {
-  "name": "홍길동",
-  "email": "gildong@naver.com",
-  "password": "12345",
+  "name": "유저20",
+  "email": "test20@naver.com",
+  "password": "1111",
   "address": "서울시 어쩌구 저쩌구",
   "birth": "1998-03-26",
   "number": "010-1111-2222"
@@ -17,8 +17,8 @@ POST http://localhost:8080/signIn/member
 Content-Type: application/json
 
 {
-  "email": "gildong@naver.com",
-  "password": "12345"
+  "email": "test1@naver.com",
+  "password": "1111"
 }
 
 ### Trainer 회원가입
@@ -26,8 +26,8 @@ POST http://localhost:8080/signUp/trainer
 Content-Type: application/json
 
 {
-  "name": "홍길동",
-  "email": "gildong@naver.com",
+  "name": "트레이너9",
+  "email": "Trainer9@naver.com",
   "password": "12345",
   "address": "서울시 어쩌구 저쩌구",
   "birth": "1998-03-26",
@@ -39,7 +39,7 @@ POST http://localhost:8080/signIn/trainer
 Content-Type: application/json
 
 {
-  "email": "gildong@naver.com",
+  "email": "Trainer3@naver.com",
   "password": "12345"
 }
 

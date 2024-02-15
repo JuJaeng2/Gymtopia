@@ -1,0 +1,47 @@
+### 운동관리 신청 처리
+POST http://localhost:8080/trainer/management/register/2
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLtirjroIjsnbTrhIgzIiwicm9sZSI6IlRSQUlORVIiLCJlbWFpbCI6IlRyYWluZXIzQG5hdmVyLmNvbSIsImlhdCI6MTcwNzEwMjEyNywiZXhwIjoxNzA3MTA1NzI3fQ.3KNC8LMv9_L4rN-NFtrPotCvn78eUPQshSVTKBXiq5ORzg4B-hUQmUhm9BqavRn_z9RMYSVH0rx_uXBwDMNj6Q
+
+Content-Type: application/json
+
+{
+  "accepted" : true
+}
+
+### 관리중인 회원 정보 가져오기
+GET http://localhost:8080/trainer/management/member
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLtirjroIjsnbTrhIgzIiwicm9sZSI6IlRSQUlORVIiLCJlbWFpbCI6IlRyYWluZXIzQG5hdmVyLmNvbSIsImlhdCI6MTcwNzEwMjEyNywiZXhwIjoxNzA3MTA1NzI3fQ.3KNC8LMv9_L4rN-NFtrPotCvn78eUPQshSVTKBXiq5ORzg4B-hUQmUhm9BqavRn_z9RMYSVH0rx_uXBwDMNj6Q
+
+### 미션 부여하기
+POST http://localhost:8080/trainer/management/mission/member/2
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLtirjroIjsnbTrhIgzIiwicm9sZSI6IlRSQUlORVIiLCJlbWFpbCI6IlRyYWluZXIzQG5hdmVyLmNvbSIsImlkIjo1LCJpYXQiOjE3MDc2NTUwMTMsImV4cCI6MTcwNzY1ODYxM30.hBV2vUJkOOCuN8FsyIqAC5KpBeOtTNVEa00DncTzMxlrmZiLANcp9_7ZXxNHVVVncOGwuanARwfWFmd_vS1LJQ
+Content-Type: application/json
+
+{
+  "title": "Test mission8",
+  "contents": "Test Contents",
+  "period": 6
+}
+
+
+### 관리중인 특정 회원의 일지 목록 조회
+GET http://localhost:8080/trainer/management/member/2/journal
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLtirjroIjsnbTrhIgzIiwicm9sZSI6IlRSQUlORVIiLCJlbWFpbCI6IlRyYWluZXIzQG5hdmVyLmNvbSIsImlhdCI6MTcwNzEwMjEyNywiZXhwIjoxNzA3MTA1NzI3fQ.3KNC8LMv9_L4rN-NFtrPotCvn78eUPQshSVTKBXiq5ORzg4B-hUQmUhm9BqavRn_z9RMYSVH0rx_uXBwDMNj6Q
+
+### 특정 회원의 특정 일지 조회
+GET http://localhost:8080/trainer/management/member/2/journal/19
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLtirjroIjsnbTrhIgzIiwicm9sZSI6IlRSQUlORVIiLCJlbWFpbCI6IlRyYWluZXIzQG5hdmVyLmNvbSIsImlhdCI6MTcwNzEwMjEyNywiZXhwIjoxNzA3MTA1NzI3fQ.3KNC8LMv9_L4rN-NFtrPotCvn78eUPQshSVTKBXiq5ORzg4B-hUQmUhm9BqavRn_z9RMYSVH0rx_uXBwDMNj6Q
+
+###  회원의 일지에대한 피드백을 작성
+POST http://localhost:8080/trainer/management/feedback/journal/19
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLtirjroIjsnbTrhIgzIiwicm9sZSI6IlRSQUlORVIiLCJlbWFpbCI6IlRyYWluZXIzQG5hdmVyLmNvbSIsImlhdCI6MTcwNzEwMjEyNywiZXhwIjoxNzA3MTA1NzI3fQ.3KNC8LMv9_L4rN-NFtrPotCvn78eUPQshSVTKBXiq5ORzg4B-hUQmUhm9BqavRn_z9RMYSVH0rx_uXBwDMNj6Q
+Content-Type: application/json
+
+{
+  "contents": "19번 일지에 대한 피드백",
+  "state": "SUCCESS"
+}
+
+### 피드백 삭제
+DELETE http://localhost:8080/trainer/management/feedback/journal/19
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLtirjroIjsnbTrhIgzIiwicm9sZSI6IlRSQUlORVIiLCJlbWFpbCI6IlRyYWluZXIzQG5hdmVyLmNvbSIsImlhdCI6MTcwNzEwMjEyNywiZXhwIjoxNzA3MTA1NzI3fQ.3KNC8LMv9_L4rN-NFtrPotCvn78eUPQshSVTKBXiq5ORzg4B-hUQmUhm9BqavRn_z9RMYSVH0rx_uXBwDMNj6Q

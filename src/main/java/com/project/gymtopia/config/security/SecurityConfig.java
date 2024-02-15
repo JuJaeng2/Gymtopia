@@ -26,9 +26,9 @@ public class SecurityConfig {
         .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
             SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authorizeRequest -> {
-          authorizeRequest.requestMatchers("/signUp/**", "/signIn/**").permitAll();
-          authorizeRequest.requestMatchers("/trainer/**").hasAuthority(String.valueOf(Roles.TRAINER));
-          authorizeRequest.requestMatchers("/member/**").hasAuthority(String.valueOf(Roles.MEMBER));
+          authorizeRequest.requestMatchers("/signUp/**", "/signIn/**", "/search/**", "sse/**").permitAll();
+          authorizeRequest.requestMatchers("/trainer/**", "/withdraw/member").hasAuthority(String.valueOf(Roles.TRAINER));
+          authorizeRequest.requestMatchers("/member/**", "/withdraw/trainer").hasAuthority(String.valueOf(Roles.MEMBER));
         })
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
