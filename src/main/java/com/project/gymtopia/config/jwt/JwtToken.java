@@ -40,7 +40,7 @@ public class JwtToken {
   @Value("${jwt.secret}")
   private String secretKey;
 
-  private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60;
+  private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 600;
   private final TrainerDetailsServiceImpl trainerDetailsService;
   private final MemberDetailsServiceImpl memberDetailsService;
 

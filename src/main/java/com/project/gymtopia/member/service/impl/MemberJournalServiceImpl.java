@@ -28,6 +28,7 @@ import com.project.gymtopia.member.data.model.JournalForm;
 import com.project.gymtopia.member.data.model.JournalResponse;
 import com.project.gymtopia.member.data.model.MediaResponse;
 import com.project.gymtopia.member.data.model.MediaUploadState;
+import com.project.gymtopia.member.data.model.MemberDto;
 import com.project.gymtopia.member.repository.JournalRepository;
 import com.project.gymtopia.member.repository.MediaRepository;
 import com.project.gymtopia.member.repository.MemberRepository;
@@ -35,6 +36,7 @@ import com.project.gymtopia.member.service.MemberJournalService;
 import com.project.gymtopia.trainer.data.entity.FeedBack;
 import com.project.gymtopia.trainer.data.entity.Trainer;
 import com.project.gymtopia.trainer.data.model.FeedBackDto;
+import com.project.gymtopia.trainer.data.model.TrainerDto;
 import com.project.gymtopia.trainer.repository.FeedBackRepository;
 import com.project.gymtopia.util.MediaUtil;
 import com.project.gymtopia.util.MultipartUtil;
@@ -49,6 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -74,6 +77,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
    * Daily Journal 업로드
    */
   @Override
+  @Transactional
   public boolean uploadJournal(
       JournalForm journalForm,
       String email,
@@ -115,6 +119,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
    * Mission Journal 업로드
    */
   @Override
+  @Transactional
   public boolean uploadJournal(JournalForm journalForm, String email, long missionId,
       List<MultipartFile> imageMultipartFileList, MultipartFile videoMultipartFile)
       throws IOException {
@@ -160,11 +165,12 @@ public class MemberJournalServiceImpl implements MemberJournalService {
       // sseEmitter를 가지고있지 않으면 redis로 전송
       alarmPublisher.sendRedisAlarm(
           MessageDto.builder()
+              .emitterId(trainer.getId() + "_" + trainer.getEmail())
               .alarmType(AlarmType.JOURNAL)
               .from(member.getName())
               .message(message)
-              .member(member)
-              .trainer(trainer)
+              .memberDto(MemberDto.from(member))
+              .trainerDto(TrainerDto.from(trainer))
               .build()
       );
     }

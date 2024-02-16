@@ -1,5 +1,6 @@
 package com.project.gymtopia.common.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.gymtopia.common.data.model.MessageDto;
 import com.project.gymtopia.common.service.AlarmPublisher;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +14,22 @@ import org.springframework.stereotype.Service;
 public class RedisAlarmPublisher implements AlarmPublisher {
 
   private final RedisTemplate<String, Object> redisTemplate;
-
+  private final ObjectMapper objectMapper = new ObjectMapper();
   @Override
   public void sendRedisAlarm(MessageDto messageDto){
-    redisTemplate.convertAndSend("Alarm", messageDto);
+
+    try{
+//      String jsonMessage = objectMapper
+//          .registerModule(new JavaTimeModule())
+//          .writeValueAsString(messageDto);
+//      log.info("Serialize : {}", jsonMessage);
+
+      redisTemplate.convertAndSend("Alarm", messageDto);
+    }catch (Exception e){
+      log.error("Serialize Error : {}", e.getMessage());
+    }
+
+
   }
 
 
