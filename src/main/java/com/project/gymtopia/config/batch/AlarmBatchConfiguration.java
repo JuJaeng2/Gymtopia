@@ -1,6 +1,9 @@
 package com.project.gymtopia.config.batch;
 
+import com.project.gymtopia.common.data.AlarmType;
 import com.project.gymtopia.common.data.entity.Mission;
+import com.project.gymtopia.common.data.model.MessageDto;
+import com.project.gymtopia.common.service.AlarmPublisher;
 import com.project.gymtopia.common.service.AlarmService;
 import com.project.gymtopia.member.data.entity.Member;
 import com.project.gymtopia.trainer.data.entity.Trainer;
@@ -34,6 +37,7 @@ public class AlarmBatchConfiguration {
   private final JobRepository jobRepository;
   private final PlatformTransactionManager transactionManager;
   private final AlarmService alarmService;
+  private final AlarmPublisher alarmPublisher;
   private final int CHUNK_SIZE = 5;
 
   @Bean
@@ -53,13 +57,15 @@ public class AlarmBatchConfiguration {
         .writer(missionItemWriter())
         .build();
   }
+
   @Bean
   public JpaCursorItemReader<Mission> missionItemReader() {
 
     return new JpaCursorItemReaderBuilder<Mission>()
         .name("missionPagingReader")
         .entityManagerFactory(entityManagerFactory)
-        .queryString("select m from Mission m where m.state = PROGRESSING and m.expirationDate = :aDayAgo")
+        .queryString(
+            "select m from Mission m where m.state = PROGRESSING and m.expirationDate = :aDayAgo")
         .parameterValues(Collections.singletonMap("aDayAgo", LocalDate.now().minusDays(1)))
         .build();
   }
@@ -75,6 +81,21 @@ public class AlarmBatchConfiguration {
       Member member = item.getMember();
       Trainer trainer = item.getTrainer();
       String message = "미션 인증 마감 하루 전 입니다.";
+
+      if (alarmService.findEmitter(member.getId() + "_" + member.getEmail())) {
+        alarmService.sendMissionAlarm(member, trainer, message);
+      } else {
+        alarmPublisher.sendRedisAlarm(
+            MessageDto.builder()
+                .alarmType(AlarmType.MISSION)
+                .from(trainer.getName())
+                .message(message)
+                .member(member)
+                .trainer(trainer)
+                .build()
+        );
+      }
+
       alarmService.sendMissionAlarm(member, trainer, message);
 
       return item;

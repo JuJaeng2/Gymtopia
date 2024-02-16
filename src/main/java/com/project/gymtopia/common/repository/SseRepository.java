@@ -38,7 +38,6 @@ public class SseRepository {
 
   public SseEmitter findEmitterById(String emitterId){
     if (sseEmitterMap.get(emitterId) == null){
-//      throw new CustomException(ErrorCode.NOT_LOGIN);
       log.info("EmitterId {} 연결 X : 알림 전송 불가능", emitterId);
     }
     return sseEmitterMap.get(emitterId);

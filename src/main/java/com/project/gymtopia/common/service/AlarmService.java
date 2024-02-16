@@ -12,4 +12,6 @@ public interface AlarmService {
   void sendJournalAlarm(Member member, Trainer trainer, String contents);
 
   void sendMissionAlarm(Member member, Trainer trainer, String contents);
+
+  boolean findEmitter(String emitterId);
 }
