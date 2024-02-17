@@ -9,12 +9,14 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.project.gymtopia.common.data.AlarmType;
 import com.project.gymtopia.common.data.JournalType;
 import com.project.gymtopia.common.data.MissionState;
 import com.project.gymtopia.common.data.entity.Mission;
+import com.project.gymtopia.common.data.model.MessageDto;
 import com.project.gymtopia.common.data.model.ResponseMessage;
 import com.project.gymtopia.common.repository.MissionRepository;
-import com.project.gymtopia.common.roles.Roles;
+import com.project.gymtopia.common.service.AlarmPublisher;
 import com.project.gymtopia.common.service.AlarmService;
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;
@@ -31,6 +33,7 @@ import com.project.gymtopia.member.repository.MediaRepository;
 import com.project.gymtopia.member.repository.MemberRepository;
 import com.project.gymtopia.member.service.MemberJournalService;
 import com.project.gymtopia.trainer.data.entity.FeedBack;
+import com.project.gymtopia.trainer.data.entity.Trainer;
 import com.project.gymtopia.trainer.data.model.FeedBackDto;
 import com.project.gymtopia.trainer.repository.FeedBackRepository;
 import com.project.gymtopia.util.MediaUtil;
@@ -64,6 +67,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
   private final MemberRepository memberRepository;
   private final FeedBackRepository feedBackRepository;
   private final AlarmService alarmService;
+  private final AlarmPublisher alarmPublisher;
 
 
   /**
@@ -112,7 +116,8 @@ public class MemberJournalServiceImpl implements MemberJournalService {
    */
   @Override
   public boolean uploadJournal(JournalForm journalForm, String email, long missionId,
-      List<MultipartFile> imageMultipartFileList, MultipartFile videoMultipartFile) throws IOException {
+      List<MultipartFile> imageMultipartFileList, MultipartFile videoMultipartFile)
+      throws IOException {
 
     Member member = memberRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
@@ -139,14 +144,33 @@ public class MemberJournalServiceImpl implements MemberJournalService {
       checkUploadState(imageUploadState, mediaFileUrlList);
     }
 
-
     // 파일 저장
     for (String mediaFileUrl : mediaFileUrlList) {
       saveImageUrl(journal, mediaFileUrl);
     }
 
-    String message = member.getName() + "님이 일지를 작성했습니다. 확인 후 피드백을 남겨주세요.";
-    alarmService.sendJournalAlarm(member, mission.getTrainer(), message);
+    // 담담 트레이너에게 알림 전송
+    Trainer trainer = mission.getTrainer();
+    String message = trainer.getName() + "님이 일지를 작성했습니다. 확인 후 피드백을 남겨주세요.";
+    // 현재 서버에 emitter 값이 있는지 확인
+    if (alarmService.findEmitter(trainer.getId() + "_" + trainer.getEmail())){
+      // sseEmitter를 가지고 있으면 알림전송
+      alarmService.sendJournalAlarm(member, trainer, message);
+    }else {
+      // sseEmitter를 가지고있지 않으면 redis로 전송
+      alarmPublisher.sendRedisAlarm(
+          MessageDto.builder()
+              .alarmType(AlarmType.JOURNAL)
+              .from(member.getName())
+              .message(message)
+              .member(member)
+              .trainer(trainer)
+              .build()
+      );
+    }
+
+
+
 
     return true;
   }
@@ -230,7 +254,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
     }
 
     List<Media> mediaList = mediaRepository.findAllByJournal(journal);
-    if (mediaList.isEmpty()){
+    if (mediaList.isEmpty()) {
       throw new CustomException(JOURNAL_NOT_FOUND);
     }
 
@@ -334,7 +358,7 @@ public class MemberJournalServiceImpl implements MemberJournalService {
 
     journalRepository.findByMission(mission).ifPresent(a -> {
       throw new CustomException(ErrorCode.MISSION_JOURNAL_ALREADY_EXIST);
-        });
+    });
 
     return mission;
   }

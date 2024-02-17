@@ -53,6 +53,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     implementation 'org.springframework.data:spring-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     tasks.named('test') {
         useJUnitPlatform()

@@ -139,6 +139,12 @@ public class AlarmServiceImpl implements AlarmService {
 
   }
 
+  @Override
+  public boolean findEmitter(String emitterId){
+    SseEmitter sseEmitter = sseRepository.findEmitterById(emitterId);
+    return sseEmitter != null;
+  }
+
 
   private void sendToClient(SseEmitter sseEmitter, String emitterId, Object data) {
     try {
