@@ -105,7 +105,7 @@ public class TrainerAuthServiceImpl implements TrainerAuthService {
   private boolean isEmailExist(String email){
 
     Optional<Trainer> optionalTrainer = trainerRepository.findByEmail(email);
-    return optionalTrainer.isPresent() && optionalTrainer.get().getRemovedDate() == null;
+    return !(optionalTrainer.isPresent() && optionalTrainer.get().getRemovedDate() == null);
   }
 
 }

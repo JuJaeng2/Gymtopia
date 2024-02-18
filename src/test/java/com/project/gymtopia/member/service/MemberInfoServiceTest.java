@@ -1,4 +1,4 @@
-package com.project.gymtopia.member;
+package com.project.gymtopia.member.service;
 
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;

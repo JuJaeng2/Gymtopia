@@ -112,8 +112,9 @@ public class MemberAuthServiceImpl implements MemberAuthService {
   private boolean isEmailExist(String email) {
     Optional<Member> optionalMember = memberRepository.findByEmail(email);
 
+
     //이메일이 있고 탈퇴하지 않은 경우
-    return optionalMember.isPresent() && optionalMember.get().getRemovedDate() == null;
+    return !(optionalMember.isPresent() && optionalMember.get().getRemovedDate() == null);
   }
 
 }

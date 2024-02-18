@@ -1,4 +1,4 @@
-package com.project.gymtopia.member;
+package com.project.gymtopia.member.service;
 
 import com.project.gymtopia.common.data.entity.Mission;
 import com.project.gymtopia.common.repository.MissionRepository;

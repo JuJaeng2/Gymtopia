@@ -163,7 +163,7 @@ public class TrainerAuthServiceTest {
   }
 
   @Test
-  @DisplayName("signUp()")
+  @DisplayName("회원가입-성공")
   void signUpTest1(){
     //given
 
@@ -171,7 +171,8 @@ public class TrainerAuthServiceTest {
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
     String encodingPassword = bCryptPasswordEncoder.encode(userSignUpForm.getPassword());
 
-    Mockito.when(trainerRepository.existsByEmail(Mockito.anyString())).thenReturn(false);
+    Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
+        .thenReturn(Optional.of(Trainer.builder().build()));
     Mockito.when(passwordEncoder.encode(Mockito.anyString())).thenReturn(encodingPassword);
     Mockito.when(trainerRepository.save(Mockito.any())).thenReturn(trainer);
     //when
@@ -188,7 +189,7 @@ public class TrainerAuthServiceTest {
   void signUpTest2(){
     //given
 
-    Mockito.when(trainerRepository.existsByEmail(Mockito.anyString())).thenReturn(true);
+    Mockito.when(trainerRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.empty());
     //when
 
     Throwable exception = Assertions.assertThrows(CustomException.class, () -> trainerAuthService.signUp(userSignUpForm));

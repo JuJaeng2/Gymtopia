@@ -1,4 +1,4 @@
-package com.project.gymtopia.member;
+package com.project.gymtopia.member.service;
 
 import com.project.gymtopia.exception.CustomException;
 import com.project.gymtopia.exception.ErrorCode;
@@ -8,7 +8,9 @@ import com.project.gymtopia.member.data.model.ReviewForm;
 import com.project.gymtopia.member.repository.MemberRepository;
 import com.project.gymtopia.member.repository.ReviewRepository;
 import com.project.gymtopia.member.service.impl.MemberReviewServiceImpl;
+import com.project.gymtopia.trainer.data.entity.Management;
 import com.project.gymtopia.trainer.data.entity.Trainer;
+import com.project.gymtopia.trainer.repository.ManagementRepository;
 import com.project.gymtopia.trainer.repository.TrainerRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
@@ -30,6 +32,8 @@ public class MemberReviewServiceTest {
   private MemberRepository memberRepository;
   @Mock
   private TrainerRepository trainerRepository;
+  @Mock
+  private ManagementRepository managementRepository;
 
   @InjectMocks
   private MemberReviewServiceImpl memberReviewService;
@@ -74,6 +78,8 @@ public class MemberReviewServiceTest {
         .thenReturn(Optional.of(member));
     Mockito.when(trainerRepository.findById(Mockito.anyLong()))
         .thenReturn(Optional.of(trainer));
+    Mockito.when(managementRepository.findByTrainerAndMember(Mockito.any(Trainer.class),Mockito.any(Member.class)))
+        .thenReturn(Optional.of(Management.builder().build()));
     Mockito.when(reviewRepository.findByMemberAndTrainer(
         Mockito.any(Member.class), Mockito.any(Trainer.class)))
         .thenReturn(Optional.empty());
@@ -119,12 +125,33 @@ public class MemberReviewServiceTest {
         .thenReturn(Optional.of(member));
     Mockito.when(trainerRepository.findById(Mockito.anyLong()))
         .thenReturn(Optional.of(trainer));
-    Mockito.when(reviewRepository.findByMemberAndTrainer(
-            Mockito.any(Member.class), Mockito.any(Trainer.class)))
-        .thenReturn(Optional.of(Review.builder().build()));
+    Mockito.when(managementRepository.findByTrainerAndMember(Mockito.any(Trainer.class),Mockito.any(Member.class)))
+        .thenReturn(Optional.empty());
+
     //when
     Throwable exception = Assertions.assertThrows(CustomException.class,
         () -> memberReviewService.writeReview(memberEmail, reviewForm, 1L));
+
+    //then
+    Assertions.assertEquals(ErrorCode.NOT_MEMBER_OF_TRAINER.getMessage(), exception.getMessage());
+  }
+  @Test
+  void 리뷰_작성_실패4(){
+    //given
+    Mockito.when(memberRepository.findByEmail(Mockito.anyString()))
+        .thenReturn(Optional.of(member));
+    Mockito.when(trainerRepository.findById(Mockito.anyLong()))
+        .thenReturn(Optional.of(trainer));
+    Mockito.when(managementRepository.findByTrainerAndMember(Mockito.any(Trainer.class),Mockito.any(Member.class)))
+            .thenReturn(Optional.of(Management.builder().build()));
+    Mockito.when(reviewRepository.findByMemberAndTrainer(
+            Mockito.any(Member.class), Mockito.any(Trainer.class)))
+        .thenReturn(Optional.of(review));
+
+    //when
+    Throwable exception = Assertions.assertThrows(CustomException.class,
+        () -> memberReviewService.writeReview(memberEmail, reviewForm, 1L));
+
     //then
     Assertions.assertEquals(ErrorCode.REVIEW_ALREADY_EXIST.getMessage(), exception.getMessage());
   }

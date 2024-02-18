@@ -121,6 +121,7 @@ public class TrainerManagementServiceImpl implements TrainerManagementService {
 
     Journal journal = journalRepository.findById(journalId)
         .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
+
     if (!journal.getMember().getEmail().equals(member.getEmail())){
       throw new CustomException(ErrorCode.NOT_WRITER_OF_JOURNAL);
     }

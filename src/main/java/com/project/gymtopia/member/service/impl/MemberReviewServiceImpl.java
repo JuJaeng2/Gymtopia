@@ -31,7 +31,8 @@ public class MemberReviewServiceImpl implements MemberReviewService {
     Trainer trainer = trainerRepository.findById(trainerId)
         .orElseThrow(() -> new CustomException(ErrorCode.TRAINER_NOT_FOUND));
 
-    managementRepository.findByTrainerAndMember(trainer, member);
+    managementRepository.findByTrainerAndMember(trainer, member)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_MEMBER_OF_TRAINER));
 
     reviewRepository.findByMemberAndTrainer(member, trainer).ifPresent(a -> {
       throw new CustomException(ErrorCode.REVIEW_ALREADY_EXIST);

@@ -1,4 +1,4 @@
-package com.project.gymtopia.member;
+package com.project.gymtopia.member.service;
 
 import static com.project.gymtopia.common.roles.Roles.MEMBER;
 
@@ -175,7 +175,7 @@ public class MemberAuthServiceTest {
   }
 
   @Test
-  @DisplayName("signUp()")
+  @DisplayName("회원가입 -성")
   void signUpTest1(){
     //given
 
@@ -183,7 +183,7 @@ public class MemberAuthServiceTest {
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
     String encodingPassword = bCryptPasswordEncoder.encode(userSignUpForm.getPassword());
 
-    Mockito.when(memberRepository.existsByEmail(Mockito.anyString())).thenReturn(false);
+    Mockito.when(memberRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(member));
     Mockito.when(passwordEncoder.encode(Mockito.anyString())).thenReturn(encodingPassword);
     Mockito.when(memberRepository.save(Mockito.any())).thenReturn(member);
     //when
@@ -200,10 +200,13 @@ public class MemberAuthServiceTest {
   void signUpTest2(){
     //given
 
-    Mockito.when(memberRepository.existsByEmail(Mockito.anyString())).thenReturn(true);
+    member.setRemovedDate(LocalDate.parse("2023-01-01"));
+
+    Mockito.when(memberRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(member));
     //when
 
-    Throwable exception = Assertions.assertThrows(CustomException.class, () -> memberAuthService.signUp(userSignUpForm));
+    Throwable exception =
+        Assertions.assertThrows(CustomException.class, () -> memberAuthService.signUp(userSignUpForm));
     //then
 
     Assertions.assertEquals(ErrorCode.REGISTERED_EMAIL.getMessage(), exception.getMessage());

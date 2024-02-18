@@ -235,8 +235,8 @@ class TrainerManagementServiceTest {
     Mockito.when(memberRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(member));
     Mockito.when(managementRepository.findByTrainerAndMember(trainer, member))
         .thenReturn(Optional.of(Management.builder().build()));
-    Mockito.when(journalRepository.findAllByMember(member))
-        .thenReturn(Optional.of(journalList));
+    Mockito.when(journalRepository.findAllByMemberAndType(Mockito.any(Member.class), Mockito.any()))
+        .thenReturn((journalList));
     //given
     JournalList journalListResult = trainerManagementService.getMissionJournal(email, 1L);
 
@@ -299,8 +299,6 @@ class TrainerManagementServiceTest {
         .thenReturn(Optional.of(member));
     Mockito.when(managementRepository.findByTrainerAndMember(trainer, member))
         .thenReturn(Optional.of(Management.builder().build()));
-    Mockito.when(journalRepository.findAllByMember(Mockito.any(Member.class)))
-        .thenReturn(Optional.empty());
     //when
     Throwable exception = Assertions.assertThrows(CustomException.class,
         () -> trainerManagementService.getMissionJournal(email, 1L));
@@ -706,6 +704,7 @@ class TrainerManagementServiceTest {
     //given
     Mockito.when(trainerRepository.findByEmail(Mockito.anyString()))
         .thenReturn(Optional.of(trainer));
+    register.setAcceptYn(true);
     Mockito.when(registerRepository.findById(Mockito.anyLong()))
         .thenReturn(Optional.of(register));
 

@@ -39,6 +39,7 @@ public enum ErrorCode {
 
   //Management
   NO_MEMBER_MANAGEMENT(HttpStatus.NOT_FOUND, "관리중인 회원이 없습니다."),
+  NOT_MEMBER_OF_TRAINER(HttpStatus.CONFLICT, "트레이너의 회원이 아닙니다."),
 
   //Mission
   MISSION_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 수행중인 미션이 존재합니다."),

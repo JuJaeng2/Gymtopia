@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 public class TrainerInfoServiceTest {
@@ -26,6 +27,8 @@ public class TrainerInfoServiceTest {
   @Mock
   private TrainerRepository trainerRepository;
 
+  @Mock
+  private PasswordEncoder passwordEncoder;
   @InjectMocks
   TrainerInfoServiceImpl trainerInfoService;
 
