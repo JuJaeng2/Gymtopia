@@ -3,6 +3,8 @@ package com.project.gymtopia.member.controller;
 import com.project.gymtopia.member.data.model.MemberResponse;
 import com.project.gymtopia.member.data.model.MemberUpdate;
 import com.project.gymtopia.member.service.MemberInfoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/member")
 @Slf4j
+@Tag(name = "Member Information Controller", description = "회원의 정보를 확인하고 수정하는 컨트롤러")
 public class MemberInfoController {
 
   private final MemberInfoService memberInfoService;
 
+  @Operation(summary = "회원 정보 확인")
   @GetMapping("/info")
   public ResponseEntity<MemberResponse> memberInformation(Authentication authentication
   ) {
@@ -31,6 +35,7 @@ public class MemberInfoController {
     return ResponseEntity.ok(memberResponse);
   }
 
+  @Operation(summary = "회원 정보 수정")
   @PutMapping("/info")
   public ResponseEntity<MemberResponse> updateMemberInformation(
       @RequestBody MemberUpdate memberUpdate, Authentication authentication

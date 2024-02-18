@@ -2,6 +2,8 @@ package com.project.gymtopia.member.controller;
 
 import com.project.gymtopia.member.data.model.ReviewForm;
 import com.project.gymtopia.member.service.MemberReviewService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/member")
+@Tag(name = "Member Review Controller", description = "회원의 트레이너에 대한 리뷰 과련 컨트롤러")
 public class MemberReviewController {
 
   private final MemberReviewService memberReviewService;
@@ -23,6 +26,7 @@ public class MemberReviewController {
   /**
    * 리뷰 작성 API
    */
+  @Operation(summary = "리뷰 작성")
   @PostMapping("/review/trainer/{trainerId}")
   public ResponseEntity<?> writeReview(
       Authentication authentication,
@@ -38,6 +42,7 @@ public class MemberReviewController {
   /**
    * 리뷰 수정 API
    */
+  @Operation(summary = "리뷰 수정")
   @PutMapping("/review/{reviewId}/trainer/{trainerId}")
   public ResponseEntity<?> updateReview(
       Authentication authentication,
@@ -53,6 +58,7 @@ public class MemberReviewController {
   /**
    * 리뷰 삭제 API
    */
+  @Operation(summary = "리뷰 삭제")
   @DeleteMapping("/review/{reviewId}")
   public ResponseEntity<?> deleteReview(
       Authentication authentication,

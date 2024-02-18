@@ -26,7 +26,16 @@ public class SecurityConfig {
         .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
             SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authorizeRequest -> {
-          authorizeRequest.requestMatchers("/signUp/**", "/signIn/**", "/search/**", "sse/**", "/redis/**").permitAll();
+          authorizeRequest.requestMatchers(
+              "/signUp/**",
+              "/signIn/**",
+              "/search/**",
+              "sse/**",
+              "/docs/**",
+              "/v3/api-docs/**",
+              "/swagger-ui/**",
+              "/swagger-ui"
+          ).permitAll();
           authorizeRequest.requestMatchers("/trainer/**", "/withdraw/member").hasAuthority(String.valueOf(Roles.TRAINER));
           authorizeRequest.requestMatchers("/member/**", "/withdraw/trainer").hasAuthority(String.valueOf(Roles.MEMBER));
         })

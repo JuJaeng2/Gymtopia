@@ -1,5 +1,9 @@
 package com.project.gymtopia.member.data.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.project.gymtopia.common.data.entity.BaseEntity;
 import com.project.gymtopia.common.roles.Roles;
 import jakarta.persistence.Column;
@@ -40,5 +44,7 @@ public class Member extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private Roles role;
 
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
   private LocalDate removedDate;
 }

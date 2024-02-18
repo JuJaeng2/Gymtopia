@@ -1,6 +1,8 @@
 package com.project.gymtopia.common.controller;
 
 import com.project.gymtopia.common.service.AlarmService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +17,12 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/sse")
+@Tag(name = "SSE Controller", description = "SSE 통신을 위한 컨트롤러")
 public class SseController {
 
   private final AlarmService alarmService;
 
+  @Operation(summary = "SSE 구독(연결)")
   @GetMapping(value = "/subscribe", produces = "text/event-stream")
   public SseEmitter subscribe(
       Authentication authentication,

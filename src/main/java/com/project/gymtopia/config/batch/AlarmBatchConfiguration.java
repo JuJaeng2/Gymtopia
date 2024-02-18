@@ -6,7 +6,9 @@ import com.project.gymtopia.common.data.model.MessageDto;
 import com.project.gymtopia.common.service.AlarmPublisher;
 import com.project.gymtopia.common.service.AlarmService;
 import com.project.gymtopia.member.data.entity.Member;
+import com.project.gymtopia.member.data.model.MemberDto;
 import com.project.gymtopia.trainer.data.entity.Trainer;
+import com.project.gymtopia.trainer.data.model.TrainerDto;
 import jakarta.persistence.EntityManagerFactory;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -87,11 +89,12 @@ public class AlarmBatchConfiguration {
       } else {
         alarmPublisher.sendRedisAlarm(
             MessageDto.builder()
+                .emitterId(member.getId() + "_" + member.getEmail())
                 .alarmType(AlarmType.MISSION)
                 .from(trainer.getName())
                 .message(message)
-                .member(member)
-                .trainer(trainer)
+                .memberDto(MemberDto.from(member))
+                .trainerDto(TrainerDto.from(trainer))
                 .build()
         );
       }
