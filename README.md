@@ -155,11 +155,11 @@
 1. AWS S3를 사용하여 이미지, 영상 파일 관리
 2. JWT, Spring Security를 사용한 인증, 인가
 3. SSE를 사용한 알림기능
-4. 특별 프로그램 신청에서 발생할 수 있는 동시성 문제 처리
+4. Spring Batch를 활용한 Scheduling
+5. 특별 프로그램 신청에서 발생할 수 있는 동시성 문제 처리
 
 # 추후 구현예정
 - ElasticSearch를 활용한 트레이너 검색
-- Spring Batch를 화용한 스케줄링
 
 # ERD
 

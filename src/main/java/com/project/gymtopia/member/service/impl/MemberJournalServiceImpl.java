@@ -109,8 +109,10 @@ public class MemberJournalServiceImpl implements MemberJournalService {
     }
 
     // 파일 저장
-    for (String mediaFileUrl : mediaFileUrlList) {
-      saveImageUrl(journal, mediaFileUrl);
+    if (!mediaFileUrlList.isEmpty()){
+      for (String mediaFileUrl : mediaFileUrlList) {
+        saveImageUrl(journal, mediaFileUrl);
+      }
     }
     return true;
   }

@@ -12,9 +12,11 @@ public enum ErrorCode {
   WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
   MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
   REGISTERED_EMAIL(HttpStatus.BAD_REQUEST, "이미 가입된 이메일 입니다."),
+  REMOVED_MEMBER_ACCOUNT(HttpStatus.NOT_FOUND, "탈퇴한 회원 계정입니다."),
 
   //Trainer
   TRAINER_NOT_FOUND(HttpStatus.NOT_FOUND, "트레이너 정보를 찾을 수 업습니다..!"),
+  REMOVED_TRAINER_ACCOUNT(HttpStatus.NOT_FOUND, "탈퇴한 트레이너 계정입니다."),
 
   // Withdraw
   NOT_SAME_MEMBER(HttpStatus.CONFLICT, "이메일이 일치하지 않습니다."),

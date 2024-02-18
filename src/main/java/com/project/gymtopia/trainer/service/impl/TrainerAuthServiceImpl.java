@@ -16,6 +16,7 @@ import com.project.gymtopia.trainer.data.model.TrainerResponse;
 import com.project.gymtopia.trainer.repository.TrainerRepository;
 import com.project.gymtopia.trainer.service.TrainerAuthService;
 import java.time.LocalDate;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,10 @@ public class TrainerAuthServiceImpl implements TrainerAuthService {
 
     Trainer trainer = trainerRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+    if (trainer.getRemovedDate() != null){
+      throw new CustomException(ErrorCode.REMOVED_TRAINER_ACCOUNT);
+    }
 
     if (!passwordEncoder.matches(password, trainer.getPassword())) {
       throw new CustomException(ErrorCode.WRONG_PASSWORD);
@@ -98,7 +103,9 @@ public class TrainerAuthServiceImpl implements TrainerAuthService {
   }
 
   private boolean isEmailExist(String email){
-    return trainerRepository.existsByEmail(email);
+
+    Optional<Trainer> optionalTrainer = trainerRepository.findByEmail(email);
+    return optionalTrainer.isPresent() && optionalTrainer.get().getRemovedDate() == null;
   }
 
 }
