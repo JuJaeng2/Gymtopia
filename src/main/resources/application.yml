@@ -37,6 +37,8 @@ cloud:
   aws:
     credentials:
       instance-profile: true
+      secret-key: 41/uvbeMCHAa2UHgvpb9zqdPOAs3wgS5yVXGB/1L
+      access-key: AKIAZTEEOWWNXJYEMD7A
     region:
       static: ap-northeast-2
       auto: false
