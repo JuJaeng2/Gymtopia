@@ -1,8 +1,5 @@
 # Gymtopia
 
-### Swagger URL
-- http://ec2-3-35-191-198.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui/index.html
-
 ## 주제
 
 > **온라인 운동 관리 서비스**
