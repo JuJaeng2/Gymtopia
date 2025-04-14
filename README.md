@@ -112,7 +112,7 @@
 
 # Architecture
 
-<img src="gymtopia_architecture.png">
+<img src="gymtopia_architecture.jpg">
 
 # Trouble Shooting
 
