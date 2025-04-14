@@ -110,6 +110,10 @@
 
 <img src="Gymtopia_ERD.png">
 
+# Architecture
+
+<img src="gymtopia_architecture.png">
+
 # Trouble Shooting
 
 ---
